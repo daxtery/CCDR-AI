@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+sentence-transformers = "*"
+tensorflow = "*"
+scipy = "*"
+interference = {editable = true, git = "https://github.com/daxtery/Trigger-Recommendations.git"}
+
+[dev-packages]
+pandas = "*"
+jupyter = "*"
+ipykernel = "*"
+matplotlib = "*"
+autopep8 = "*"
