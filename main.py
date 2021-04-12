@@ -42,8 +42,8 @@ if __name__ == "__main__":
     t = ToyInterface(
         processor=ECM(distance_threshold=5.),
         transformers={
-            "query": UserQueryTransformer(),
-            "equipment": EquipmentTransformer()
+            "query": UserQueryTransformer(modelname='neuralmind/bert-large-portuguese-cased'),
+            "equipment": EquipmentTransformer(modelname='neuralmind/bert-large-portuguese-cased')
         },
         scoring_calculator=ToyScoringCalculator()
     )
