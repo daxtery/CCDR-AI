@@ -1,82 +1,46 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict
 
-from trigger.metrics.match import quality_metric, real_metric
-from trigger.models.user import User
-from trigger.models.opening import Opening
+from ccdr.models.equipment import Equipment
+from ccdr.models.user_query import UserQuery
 
 from interference.scoring import ScoringOptions, Scoring, ScoringCalculator
 from interference.transformers.transformer_pipeline import Instance
 
 
 @dataclass()
-class CCDRScoringOptions(ScoringOptions):
-    similarity_weight: float = .5
-    quality_weight: float = .5
-    quality_metric_hardskill_weight: float = .6
-    quality_metric_softskill_weight: float = .4
+class ToyScoringOptions(ScoringOptions):
+    pass
 
 
 @dataclass()
-class CCDRScoring(Scoring):
-    quality_score: float
-    is_quality_match: bool = field(repr=False)
-
-    real_score: float
-    is_real_match: bool = field(repr=False)
-
-    @property
-    def is_match(self) -> bool:
-        return self.is_real_match
-
-    @property
-    def score(self) -> float:
-        return self.real_score
+class ToyScoring(Scoring):
+    pass
 
 
-class CCDRScoringCalculator(ScoringCalculator):
+class ToyScoringCalculator(ScoringCalculator):
 
-    def __init__(self, scoring_options: CCDRScoringOptions = CCDRScoringOptions()):
+    def __init__(self, scoring_options: ToyScoringOptions = ToyScoringOptions()):
         self.scoring_options = scoring_options
 
     def __call__(
         self,
-        user_instance: Instance[User],
-        opening_instance: Instance[Opening]
-    ) -> CCDRScoring:
+        user_query_instance: Instance[UserQuery],
+        equipment_instance: Instance[Equipment]
+    ) -> ToyScoring:
 
         base_scoring: Scoring = ScoringCalculator.__call__(
-            self, user_instance, opening_instance)
+            self, user_query_instance, equipment_instance)
 
-        quality_score = quality_metric(
-            user_instance.value,
-            opening_instance.value,
-            self.scoring_options.quality_metric_hardskill_weight,
-            self.scoring_options.quality_metric_softskill_weight
-        )
-
-        real_score = real_metric(
-            base_scoring.similarity_score,
-            quality_score,
-            self.scoring_options.similarity_weight,
-            self.scoring_options.quality_weight
-        )
-
-        return CCDRScoring(
+        return ToyScoring(
             base_scoring.similarity_score,
             base_scoring.is_match,
-            quality_score,
-            quality_score >= self.scoring_options.score_to_be_match,
-            real_score,
-            real_score >= self.scoring_options.score_to_be_match
         )
 
     def describe(self) -> Dict[str, Any]:
         return {
             "scoring_options": self.scoring_options,
             "scoring": [
-                "similarity_score = similarity_metric(instance1.embedding, instance2.embedding)",
-                f"quality_score = quality_metric(instance1.user, instance2.opening, {self.scoring_options.quality_metric_hardskill_weight}, {self.scoring_options.quality_metric_softskill_weight})",
-                f"real_metric(similarity_score, quality_score, {self.scoring_options.similarity_weight}, {self.scoring_options.quality_weight})",
+                "similarity_metric(instance1.embedding, instance2.embedding)",
             ]
         }
