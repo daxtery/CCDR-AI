@@ -29,5 +29,4 @@ class ToyInterface(Interface):
     def get_scorings_for(self, instance: Instance[UserQuery]) -> Sequence[ToyScoring]:
         scorings = super().get_scorings_for(instance)
         scorings = cast(Sequence[ToyScoring], scorings)
-        # FIXME: Save these for later?
         return scorings
