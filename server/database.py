@@ -1,4 +1,3 @@
-from typing import Sequence
 from ccdr.models.equipment import Equipment
 
 toy_equipments = {
@@ -10,9 +9,10 @@ toy_equipments = {
 }
 
 
-def get_equipment_by_id(_id: str) -> Equipment:
-    return toy_equipments[_id]
+class DatabaseAcessor:
 
+    def get_equipment_by_id(self, _id: str) -> Equipment:
+        return toy_equipments[_id]
 
-def get_all_equipments():
-    return toy_equipments.items()
+    def get_all_equipments(self):
+        return toy_equipments.items()

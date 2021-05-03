@@ -1,14 +1,12 @@
 
-from ccdr.transformers.equipment_transformer import StringuifyEquipmentTransformer
-from ccdr.models.equipment import Equipment, stringify
+from server.database import DatabaseAcessor
 from ccdr.ranking_model.ranking import RankingModel
 from ccdr.models.user_query import UserQuery
-from ccdr.ccdr_interface import ToyTypeInterface, TransformersDict
-from server.InMemoryDatabase import get_equipment_by_id, get_all_equipments
+from ccdr.ccdr_interface import TransformersDict
 
 from typing import Any, Dict, Iterator, List, Sequence, Tuple, cast
 
-from interference.transformers.transformer_pipeline import TransformerPipeline, Instance
+from interference.interface import Interface
 
 import numpy
 
@@ -22,21 +20,23 @@ class ToyDriver:
 
     def __init__(
         self,
-        interface: ToyTypeInterface,
+        interface: Interface,
         stringuifier_transformers: TransformersDict,
         ranker: RankingModel,
-        config: Dict[str, Any]
+        database: DatabaseAcessor,
+        config: Dict[str, Any],
     ):
         self.interface = interface
         self.ranker = ranker
         self.config = config
         self.stringuify_transformer = stringuifier_transformers
         self.stringuified_equipment_embeddings: Dict[str, numpy.ndarray] = {}
+        self.database = database
 
     def init_processor(self) -> "ToyDriver":
         logger.info("Initializing processor")
 
-        for _id, equipment in get_all_equipments():
+        for _id, equipment in self.database.get_all_equipments():
             instance = self.interface.try_create_instance_from_value(
                 "equipment", equipment)
 
@@ -51,7 +51,7 @@ class ToyDriver:
         return self
 
     def add_equipment_by_id(self, _id: str):
-        equipment = get_equipment_by_id(_id)
+        equipment = self.database.get_equipment_by_id(_id)
 
         instance = self.interface.try_create_instance_from_value(
             "equipment", equipment)
