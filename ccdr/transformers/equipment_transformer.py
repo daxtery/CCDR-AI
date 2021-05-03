@@ -5,21 +5,27 @@ from interference.transformers.transformer_pipeline import TransformerPipeline, 
 import numpy
 from sentence_transformers import SentenceTransformer
 
-from ccdr.models.equipment import Equipment
-from dataclasses import asdict
+from ccdr.models.equipment import Equipment, stringify
 
-class EquipmentTransformer(TransformerPipeline[Equipment]):
+
+class EquipmentTypeTransformer(TransformerPipeline[Equipment]):
 
     def __init__(self, modelname: str = 'neuralmind/bert-large-portuguese-cased'):
         self.model = SentenceTransformer(modelname)
 
-    def calculate_embedding(self, equipment: Equipment) -> numpy.ndarray:
-        return self.model.encode(stringify(equipment))
+    def calculate_embedding(self, equipment: Equipment):
+        _type = self.extract_type(equipment)
+        return self.model.encode(_type)
 
-    def transform(self, equipment: Equipment) -> Instance[Equipment]:
-        embedding = self.calculate_embedding(equipment)
-        return Instance(equipment, embedding)
+    def extract_type(self, equipment: Equipment):
+        return "TODO:"
 
-# TODO: Keep this?
-def stringify(equipment: Equipment) -> str:
-    return str(asdict(equipment))
+
+class StringuifyEquipmentTransformer(TransformerPipeline[Equipment]):
+
+    def __init__(self, modelname: str = 'neuralmind/bert-large-portuguese-cased'):
+        self.model = SentenceTransformer(modelname)
+
+    def calculate_embedding(self, equipment: Equipment):
+        stringuified = stringify(equipment)
+        return self.model.encode(stringuified)
