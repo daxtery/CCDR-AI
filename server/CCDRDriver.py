@@ -1,12 +1,16 @@
 
+import re
 from server.database import DatabaseAcessor
 from ccdr.ranking_model.ranking import RankingModel
 from ccdr.models.user_query import UserQuery
 from ccdr.ccdr_interface import TransformersDict
 
-from typing import Any, Dict, Iterator, List, Sequence, Tuple, cast
+from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple, cast
 
 from interference.interface import Interface
+
+from itertools import chain
+from functools import reduce
 
 import numpy
 
@@ -14,6 +18,27 @@ import logging
 
 logger = logging.getLogger('trigger_driver')
 logger.setLevel(logging.INFO)
+
+
+def extract_type_with_regex(query: str) -> Optional[str]:
+    KEYWORDS_REGEXES = {
+        "estadio": ["estádio"],
+        "escola": [],
+        "universidade": ["col[e|é]gio"],
+        "teatro": [],
+        "centro de dia": [],
+        "centro hospitalar": []
+    }
+
+    query_lower = query.lower()
+
+    for keyword, regexes in KEYWORDS_REGEXES.items():
+        if query_lower.find(keyword) != -1:
+            return keyword
+
+        for regex in regexes:
+            if re.match(regex, query_lower) is not None:
+                return keyword
 
 
 class ToyDriver:
@@ -67,27 +92,37 @@ class ToyDriver:
     def get_query_results(self, query: str):
         query_ = UserQuery(query)
 
-        instance = self.interface.try_create_instance_from_value(
-            "query", query_)
+        _type = extract_type_with_regex(query_.query)
 
-        assert instance
+        if _type is not None:
+            instance = self.interface.try_create_instance_from_value(
+                "query_type", _type)
 
-        relevant_equipments = self.interface.get_scorings_for(instance)
+            assert instance
+
+            relevant_equipments_tags = (
+                scoring.scored_tag for scoring in self.interface.get_scorings_for(instance)
+                if scoring.scored_tag is not None  # FIXME: It shouldn't be?!
+            )
+
+        else:
+            cluster_ids = self.interface.processor.get_cluster_ids()
+            all_tags = map(lambda _cid: self.interface.processor.get_tags_in_cluster(_cid),
+                           cluster_ids,
+                           )
+
+            relevant_equipments_tags = chain(*all_tags)
 
         stringify_embedding = self.stringuify_transformer["query"].calculate_embedding(
             query_)
 
         rankings: Dict[str, float] = {}
 
-        for scoring in relevant_equipments:
-            assert scoring.scored_tag
-
-            embedding = self.stringuified_equipment_embeddings[scoring.scored_tag]
+        for tag in relevant_equipments_tags:
+            embedding = self.stringuified_equipment_embeddings[tag]
 
             ranking = self.ranker(stringify_embedding, embedding)
-            rankings[scoring.scored_tag] = ranking
-
-        # TODO: save for later?
+            rankings[tag] = ranking
 
         return [
             tag

@@ -7,7 +7,7 @@ from interference.transformers.transformer_pipeline import NumpyToInstancePipeli
 from interference.interface import Interface
 from interference.scoring import ScoringCalculator
 
-from ccdr.transformers.user_query_transformer import UserQueryTransformer, UserQueryTypeTransformer
+from ccdr.transformers.user_query_transformer import UserQueryTransformer, TypeTransformer
 from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer, StringuifyEquipmentTransformer
 
 import numpy
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     t = Interface(
         processor=ECM(distance_threshold=5.),
         transformers={
-            "query": UserQueryTypeTransformer(modelname='neuralmind/bert-large-portuguese-cased'),
+            "query_type": TypeTransformer(modelname='neuralmind/bert-large-portuguese-cased'),
             "equipment": EquipmentTypeTransformer(modelname='neuralmind/bert-large-portuguese-cased'),
         },
         scoring_calculator=ScoringCalculator(),
