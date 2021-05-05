@@ -14,11 +14,7 @@ class EquipmentTypeTransformer(TransformerPipeline[Equipment]):
         self.model = SentenceTransformer(modelname)
 
     def calculate_embedding(self, equipment: Equipment):
-        _type = self.extract_type(equipment)
-        return self.model.encode(_type)
-
-    def extract_type(self, equipment: Equipment):
-        return "TODO:"
+        return self.model.encode(equipment.type_)
 
 
 class StringuifyEquipmentTransformer(TransformerPipeline[Equipment]):
