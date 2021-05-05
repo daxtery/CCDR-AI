@@ -4,6 +4,7 @@ toy_equipments = {
     "1": Equipment(area="Desporto", type_="Estádio"),
     "2": Equipment(area="Saúde", type_="Centro Hospitalar"),
     "3": Equipment(area="Educação", type_="Universidade"),
+    "3": Equipment(area="Educação", type_="Escola"),
     "4": Equipment(area="Social", type_="Centro de dia"),
     "5": Equipment(area="Cultura", type_="Teatro"),
 }

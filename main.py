@@ -11,8 +11,23 @@ from ccdr.models.equipment import stringify
 from ccdr.transformers.user_query_transformer import TypeTransformer
 from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer
 
-import numpy
 from pprint import pprint
+
+
+# NOTE: Only for testing
+
+
+def query(driver: ToyDriver, v: str):
+    print(v)
+    db = driver.database
+
+    results = driver.get_query_results(v)
+
+    pretty_results = {
+        tag: (db.get_equipment_by_id(tag), score) for tag, score in results.items()
+    }
+
+    pprint(pretty_results)
 
 
 if __name__ == "__main__":
@@ -38,4 +53,6 @@ if __name__ == "__main__":
     )
 
     driver.init_processor()
-    pprint(driver.get_query_results("Cultura"))
+
+    query(driver, "Piscina municipal de Estremoz")
+    query(driver, "Escola Secundária Rainha Santa Isabel")
