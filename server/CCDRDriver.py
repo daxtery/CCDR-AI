@@ -1,11 +1,12 @@
 
+from ccdr.models.equipment import Equipment
 import re
 from server.database import DatabaseAcessor
-from ccdr.ranking_model.ranking import RankingModel
+from ccdr.ranking_model.ranking import RankingExtension, RankingModel
 from ccdr.models.user_query import UserQuery
 from ccdr.ccdr_interface import TransformersDict
 
-from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple, cast
+from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, cast
 
 from interference.interface import Interface
 
@@ -46,48 +47,43 @@ class ToyDriver:
     def __init__(
         self,
         interface: Interface,
-        stringuifier_transformers: TransformersDict,
-        ranker: RankingModel,
+        stringify_equipment_func: Callable[[Equipment], str],
+        ranking: RankingExtension,
         database: DatabaseAcessor,
         config: Dict[str, Any],
     ):
         self.interface = interface
-        self.ranker = ranker
+        self.ranking = ranking
         self.config = config
-        self.stringuify_transformer = stringuifier_transformers
-        self.stringuified_equipment_embeddings: Dict[str, numpy.ndarray] = {}
+        self.stringify_equipment_func = stringify_equipment_func
         self.database = database
 
     def init_processor(self) -> "ToyDriver":
         logger.info("Initializing processor")
 
-        for _id, equipment in self.database.get_all_equipments():
+        for tag, equipment in self.database.get_all_equipments():
             instance = self.interface.try_create_instance_from_value(
                 "equipment", equipment)
 
             assert instance
-            self.interface.add(_id, instance)
+            self.interface.add(tag, instance)
 
-            embedding = self.stringuify_transformer["equipment"].calculate_embedding(
-                equipment)
-
-            self.stringuified_equipment_embeddings[_id] = embedding
+            stringuified = self.stringify_equipment_func(equipment)
+            self.ranking.equipment_was_added(tag, stringuified)
 
         return self
 
-    def add_equipment_by_id(self, _id: str):
-        equipment = self.database.get_equipment_by_id(_id)
+    def add_equipment_by_tag(self, tag: str):
+        equipment = self.database.get_equipment_by_id(tag)
 
         instance = self.interface.try_create_instance_from_value(
             "equipment", equipment)
 
         assert instance
-        self.interface.add(_id, instance)
+        self.interface.add(tag, instance)
 
-        embedding = self.stringuify_transformer["equipment"].calculate_embedding(
-            equipment)
-
-        self.stringuified_equipment_embeddings[_id] = embedding
+        stringuified = self.stringify_equipment_func(equipment)
+        self.ranking.equipment_was_added(tag, stringuified)
 
     def get_query_results(self, query: str):
         query_ = UserQuery(query)
@@ -100,31 +96,18 @@ class ToyDriver:
 
             assert instance
 
-            relevant_equipments_tags = (
+            relevant_equipments_tags = list(
                 scoring.scored_tag for scoring in self.interface.get_scorings_for(instance)
                 if scoring.scored_tag is not None  # FIXME: It shouldn't be?!
             )
 
         else:
             cluster_ids = self.interface.processor.get_cluster_ids()
-            all_tags = map(lambda _cid: self.interface.processor.get_tags_in_cluster(_cid),
+            tags_by_cluster = map(lambda _cid: self.interface.processor.get_tags_in_cluster(_cid),
                            cluster_ids,
                            )
 
-            relevant_equipments_tags = chain(*all_tags)
+            relevant_equipments_tags = list(chain(*tags_by_cluster))
 
-        stringify_embedding = self.stringuify_transformer["query"].calculate_embedding(
-            query_)
-
-        rankings: Dict[str, float] = {}
-
-        for tag in relevant_equipments_tags:
-            embedding = self.stringuified_equipment_embeddings[tag]
-
-            ranking = self.ranker(stringify_embedding, embedding)
-            rankings[tag] = ranking
-
-        return [
-            tag
-            for tag, _ in sorted(rankings.items(), key=lambda s: s[1], reverse=True)
-        ]
+        rankings = self.ranking.rank(query, relevant_equipments_tags)
+        return rankings
