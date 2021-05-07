@@ -1,6 +1,6 @@
 from server.database import DatabaseAcessor
 from ccdr.ranking_model.ranking import RankingExtension, RankingModel
-from server.CCDRDriver import ToyDriver
+from server.CCDRDriver import CCDRDriver
 from interference.clusters.ecm import ECM
 
 from interference.interface import Interface
@@ -17,11 +17,11 @@ from pprint import pprint
 # NOTE: Only for testing
 
 
-def query(driver: ToyDriver, v: str):
+def query(driver: CCDRDriver, v: str):
     print(v)
     db = driver.database
 
-    results = driver.get_query_results(v)
+    results = driver.get_query_rankings(v)
 
     pretty_results = {
         tag: (db.get_equipment_by_id(tag), score) for tag, score in results.items()
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         scoring_calculator=ScoringCalculator(),
     )
 
-    driver = ToyDriver(
+    driver = CCDRDriver(
         t,
         ranking=RankingExtension(
             tokenizer_name="neuralmind/bert-base-portuguese-cased",

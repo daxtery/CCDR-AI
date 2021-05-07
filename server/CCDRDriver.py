@@ -13,8 +13,6 @@ from interference.interface import Interface
 from itertools import chain
 from functools import reduce
 
-import numpy
-
 import logging
 
 logger = logging.getLogger('trigger_driver')
@@ -42,7 +40,7 @@ def extract_type_with_regex(query: str) -> Optional[str]:
                 return keyword
 
 
-class ToyDriver:
+class CCDRDriver:
 
     def __init__(
         self,
@@ -58,7 +56,7 @@ class ToyDriver:
         self.stringify_equipment_func = stringify_equipment_func
         self.database = database
 
-    def init_processor(self) -> "ToyDriver":
+    def init_processor(self):
         logger.info("Initializing processor")
 
         for tag, equipment in self.database.get_all_equipments():
@@ -86,6 +84,10 @@ class ToyDriver:
         self.ranking.equipment_was_added(tag, stringuified)
 
     def get_query_results(self, query: str):
+        rankings = self.get_query_rankings(query)
+        return [tag for tag in rankings]
+
+    def get_query_rankings(self, query: str):
         query_ = UserQuery(query)
 
         _type = extract_type_with_regex(query_.query)
@@ -96,16 +98,15 @@ class ToyDriver:
 
             assert instance
 
-            relevant_equipments_tags = list(
+            relevant_equipments_tags: List[str] = list(
                 scoring.scored_tag for scoring in self.interface.get_scorings_for(instance)
-                if scoring.scored_tag is not None  # FIXME: It shouldn't be?!
+                if scoring.scored_tag is not None
             )
 
         else:
             cluster_ids = self.interface.processor.get_cluster_ids()
             tags_by_cluster = map(lambda _cid: self.interface.processor.get_tags_in_cluster(_cid),
-                           cluster_ids,
-                           )
+                                  cluster_ids)
 
             relevant_equipments_tags = list(chain(*tags_by_cluster))
 
