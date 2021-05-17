@@ -52,3 +52,9 @@ def get_equipment(query: str):
     results = driver.get_query_results(query)
     response = json.dumps(results)
     return response
+
+
+@app.route('/feedback/<query_hash>/<tag>', methods=['POST'])
+def give_feedback(query_hash: str, tag: str):
+    driver.give_feedback(query_hash, tag)
+    return "Ok"

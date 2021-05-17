@@ -113,3 +113,6 @@ class CCDRDriver:
 
         rankings = self.ranking.rank(query, relevant_equipments_tags)
         return rankings
+
+    def give_feedback(self, query_hash: str, tag: str):
+        self.ranking.feedback(query_hash, tag)
