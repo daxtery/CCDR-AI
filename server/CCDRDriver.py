@@ -84,9 +84,8 @@ class CCDRDriver:
         self.ranking.equipment_was_added(tag, stringuified)
 
     def get_query_results(self, query: str):
-        query_hash = hash_query(query)
         rankings = self.get_raw_query_rankings(query)
-        return query_hash, [tag for tag in rankings]
+        return [tag for tag in rankings]
 
     def get_raw_query_rankings(self, query: str):
         query_ = UserQuery(query)
@@ -114,5 +113,5 @@ class CCDRDriver:
         rankings = self.ranking.rank(query, relevant_equipments_tags)
         return rankings
 
-    def give_feedback(self, query_hash: str, tag: str):
-        self.ranking.feedback(query_hash, tag)
+    def give_feedback(self, feedback: Dict[str, List[str]]):
+        self.ranking.feedback(feedback)

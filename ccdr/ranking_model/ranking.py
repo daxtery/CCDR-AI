@@ -55,8 +55,9 @@ class RankingExtension:
             for index in indexes
         }
 
-    def feedback(self, query_hash: str, tag: str):
-        self.stringuified_hashed_query_feedback[query_hash][tag] += 1
+    def feedback(self, clicks: Dict[str, List[str]]):
+        for hash_, clicked_tags in clicks.items():
+            self.stringuified_hashed_query_feedback[hash_].update(clicked_tags)
 
 
 class RankingModel(tf.keras.Model):

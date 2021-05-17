@@ -1,4 +1,6 @@
-from flask import Flask
+from flask import Flask, request, jsonify
+
+from typing import List, Dict
 
 from server.database import DatabaseAcessor
 from ccdr.ranking_model.ranking import RankingExtension, RankingModel
@@ -49,14 +51,12 @@ def add_equipment(tag: str):
 
 @app.route('/search/<query>', methods=['GET'])
 def get_equipment(query: str):
-    hash_, results = driver.get_query_results(query)
-    return {
-        "hash": hash_,
-        "results": results
-    }
+    results = driver.get_query_results(query)
+    return json.dumps(results)
 
 
-@app.route('/feedback/<query_hash>/<tag>', methods=['POST'])
-def give_feedback(query_hash: str, tag: str):
-    driver.give_feedback(query_hash, tag)
+@app.route('/feedback/', methods=['POST'])
+def give_feedback():
+    data: Dict[str, List[str]] = request.json
+    driver.give_feedback(data)
     return "Ok"
