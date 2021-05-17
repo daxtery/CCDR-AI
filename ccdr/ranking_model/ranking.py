@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Any, Counter, Dict, Iterator, List, Sequence, Tuple, Iterable
 import tensorflow as tf
 from transformers import AutoTokenizer, TFBertModel
@@ -9,11 +10,16 @@ def argsort(seq: Sequence):
     return sorted(range(len(seq)), key=seq.__getitem__)
 
 
+def hash_query(query: str):
+    return hashlib.sha256(query.encode('utf-8')).hexdigest()
+
+
 class RankingExtension:
     def __init__(self, tokenizer_name: str, model_name: str, ranker: "RankingModel"):
         self.stringuified_equipment_tf_output: Dict[str, Any] = {}
         self.stringuified_hashed_query_output: Dict[str, Any] = {}
-        self.stringuified_hashed_query_feedback: Dict[str, Counter[str]] = {}
+        self.stringuified_hashed_query_feedback: Dict[str, Counter[str]] = defaultdict(
+            Counter)
 
         self.tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_name)
@@ -34,17 +40,17 @@ class RankingExtension:
             stringified)
 
     def ensure_query_is_preprocessed(self, query: str):
-        query_hash = hashlib.sha256(query.encode('utf-8')).hexdigest()
+        query_hash = hash_query(query)
         if not query_hash in self.stringuified_hashed_query_output:
             self.stringuified_hashed_query_output[query_hash] = self._get_output(
                 query)
             self.stringuified_hashed_query_feedback[query_hash] = Counter()
 
-        return query_hash, self.stringuified_hashed_query_output[query_hash]
+        return self.stringuified_hashed_query_output[query_hash]
 
     def rank(self, query: str, equipment_tags: Sequence[str]) -> Dict[str, float]:
         scores: List[float] = []
-        _, query_output = self.ensure_query_is_preprocessed(query)
+        query_output = self.ensure_query_is_preprocessed(query)
         for tag in equipment_tags:
             assert tag in self.stringuified_equipment_tf_output
             score = self.ranker(

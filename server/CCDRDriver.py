@@ -2,7 +2,7 @@
 from ccdr.models.equipment import Equipment
 import re
 from server.database import DatabaseAcessor
-from ccdr.ranking_model.ranking import RankingExtension, RankingModel
+from ccdr.ranking_model.ranking import RankingExtension, RankingModel, hash_query
 from ccdr.models.user_query import UserQuery
 from ccdr.ccdr_interface import TransformersDict
 
@@ -84,7 +84,7 @@ class CCDRDriver:
         self.ranking.equipment_was_added(tag, stringuified)
 
     def get_query_results(self, query: str):
-        query_hash, _ = self.ranking.ensure_query_is_preprocessed(query)
+        query_hash = hash_query(query)
         rankings = self.get_raw_query_rankings(query)
         return query_hash, [tag for tag in rankings]
 
