@@ -44,7 +44,7 @@ app = Flask(__name__)
 @app.route('/equipment/<tag>', methods=['POST'])
 def add_equipment(tag: str):
     driver.add_equipment_by_tag(tag)
-    return "Done"
+    return "Ok"
 
 
 @app.route('/search/<query>', methods=['GET'])
