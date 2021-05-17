@@ -84,8 +84,9 @@ class CCDRDriver:
         self.ranking.equipment_was_added(tag, stringuified)
 
     def get_query_results(self, query: str):
-        rankings = self.get_query_rankings(query)
-        return [tag for tag in rankings]
+        query_hash, _ = self.ranking.preprocess_query(query)
+        rankings = self.get_raw_query_rankings(query)
+        return query_hash, [tag for tag in rankings]
 
     def get_raw_query_rankings(self, query: str):
         query_ = UserQuery(query)

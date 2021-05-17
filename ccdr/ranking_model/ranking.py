@@ -1,6 +1,7 @@
-from typing import Any, Dict, Iterator, List, Sequence, Tuple, Iterable
+from typing import Any, Counter, Dict, Iterator, List, Sequence, Tuple, Iterable
 import tensorflow as tf
 from transformers import AutoTokenizer, TFBertModel
+import hashlib
 
 
 def argsort(seq: Sequence):
@@ -11,6 +12,9 @@ def argsort(seq: Sequence):
 class RankingExtension:
     def __init__(self, tokenizer_name: str, model_name: str, ranker: "RankingModel"):
         self.stringuified_equipment_tf_output: Dict[str, Any] = {}
+        self.stringuified_hashed_query_output: Dict[str, Any] = {}
+        self.stringuified_hashed_query_feedback: Dict[str, Counter[str]] = {}
+
         self.tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_name)
 
@@ -29,9 +33,18 @@ class RankingExtension:
         self.stringuified_equipment_tf_output[tag] = self._get_output(
             stringified)
 
+    def preprocess_query(self, query: str):
+        query_hash = hashlib.sha256(query.encode('utf-8')).hexdigest()
+        if not query_hash in self.stringuified_hashed_query_output:
+            self.stringuified_hashed_query_output[query_hash] = self._get_output(
+                query)
+            self.stringuified_hashed_query_feedback[query_hash] = Counter()
+
+        return query_hash, self.stringuified_hashed_query_output[query_hash]
+
     def rank(self, query: str, equipment_tags: Sequence[str]) -> Dict[str, float]:
         scores: List[float] = []
-        query_output = self._get_output(query)
+        _, query_output = self.preprocess_query(query)
         for tag in equipment_tags:
             assert tag in self.stringuified_equipment_tf_output
             score = self.ranker(
