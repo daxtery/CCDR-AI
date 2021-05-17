@@ -49,9 +49,11 @@ def add_equipment(tag: str):
 
 @app.route('/search/<query>', methods=['GET'])
 def get_equipment(query: str):
-    results = driver.get_query_results(query)
-    response = json.dumps(results)
-    return response
+    hash_, results = driver.get_query_results(query)
+    return {
+        "hash": hash_,
+        "results": results
+    }
 
 
 @app.route('/feedback/<query_hash>/<tag>', methods=['POST'])
