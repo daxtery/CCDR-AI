@@ -87,7 +87,7 @@ class CCDRDriver:
         rankings = self.get_query_rankings(query)
         return [tag for tag in rankings]
 
-    def get_query_rankings(self, query: str):
+    def get_raw_query_rankings(self, query: str):
         query_ = UserQuery(query)
 
         _type = extract_type_with_regex(query_.query)

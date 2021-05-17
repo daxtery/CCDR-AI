@@ -21,7 +21,7 @@ def query(driver: CCDRDriver, v: str):
     print(v)
     db = driver.database
 
-    results = driver.get_query_rankings(v)
+    results = driver.get_raw_query_rankings(v)
 
     pretty_results = {
         tag: (db.get_equipment_by_id(tag), score) for tag, score in results.items()
