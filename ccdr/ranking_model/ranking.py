@@ -17,7 +17,7 @@ def hash_query(query: str):
 class RankingExtension:
     def __init__(self, tokenizer_name: str, model_name: str, ranker: "RankingModel"):
         self.stringuified_equipment_tf_output: Dict[str, Any] = {}
-        self.stringuified_hashed_query_feedback: Dict[str, Counter[str]] = defaultdict(
+        self.query_feedback: Dict[str, Counter[str]] = defaultdict(
             Counter)
 
         self.tokenizer = AutoTokenizer.from_pretrained(
@@ -56,8 +56,8 @@ class RankingExtension:
         }
 
     def feedback(self, clicks: Dict[str, List[str]]):
-        for hash_, clicked_tags in clicks.items():
-            self.stringuified_hashed_query_feedback[hash_].update(clicked_tags)
+        for query, clicked_tags in clicks.items():
+            self.query_feedback[query].update(clicked_tags)
 
 
 class RankingModel(tf.keras.Model):
