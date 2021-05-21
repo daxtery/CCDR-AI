@@ -11,7 +11,7 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tupl
 from interference.interface import Interface
 
 from itertools import chain
-from functools import reduce
+import unicodedata
 
 import logging
 
@@ -19,24 +19,43 @@ logger = logging.getLogger('ccdr_driver')
 logger.setLevel(logging.INFO)
 
 
+def remove_accents(word: str) -> str:
+    normalized = ''.join(ch for ch in unicodedata.normalize(
+        'NFKD', word) if not unicodedata.combining(ch))
+
+    return normalized
+
+
+KEYWORDS_REGEXES = {
+    "estádio": [],
+    "escola": [],
+    "universidade": ["colégio"],
+    "teatro": [],
+    "centro de dia": [],
+    "centro hospitalar": []
+}
+
+
 def extract_type_with_regex(query: str) -> Optional[str]:
-    KEYWORDS_REGEXES = {
-        "estadio": ["estádio"],
-        "escola": [],
-        "universidade": ["col[e|é]gio"],
-        "teatro": [],
-        "centro de dia": [],
-        "centro hospitalar": []
-    }
 
     query_lower = query.lower()
 
     for keyword, regexes in KEYWORDS_REGEXES.items():
+        # Estádio -> Estadio
+        no_accents = remove_accents(keyword)
+
         if query_lower.find(keyword) != -1:
+            return keyword
+
+        if query_lower.find(no_accents) != -1:
             return keyword
 
         for regex in regexes:
             if re.match(regex, query_lower) is not None:
+                return keyword
+
+            no_accents_regex = remove_accents(regex)
+            if re.match(no_accents_regex, query_lower) is not None:
                 return keyword
 
 
