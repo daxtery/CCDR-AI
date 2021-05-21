@@ -18,7 +18,7 @@ from pprint import pprint
 
 
 def query(driver: CCDRDriver, v: str):
-    print(v)
+    print("Q:", v)
     db = driver.database
 
     results = driver.get_raw_query_rankings(v)
@@ -26,7 +26,7 @@ def query(driver: CCDRDriver, v: str):
     pretty_results = {
         tag: (db.get_equipment_by_id(tag), score) for tag, score in results.items()
     }
-
+    print("A:", end=None)
     pprint(pretty_results)
 
 
@@ -56,3 +56,6 @@ if __name__ == "__main__":
 
     query(driver, "Piscina municipal de Estremoz")
     query(driver, "Escola Secundária Rainha Santa Isabel")
+    query(driver, "Colegio da noite")
+    query(driver, "Colégio da noite")
+    query(driver, "Estadio da Luz")
