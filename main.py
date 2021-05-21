@@ -1,7 +1,7 @@
-from server.database import DatabaseAcessor
+from server.database import DatabaseAccessor, MongoDatabaseConfig, InMemoryDatabaseAccessor, MongoDatabaseAccessor
 from ccdr.ranking_model.ranking import RankingExtension, RankingModel
 from server.CCDRDriver import CCDRDriver
-from interference.clusters.ecm import ECM
+from interference.clusters.gturbo import GTurbo
 
 from interference.interface import Interface
 from interference.scoring import ScoringCalculator
@@ -13,13 +13,14 @@ from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer
 
 from pprint import pprint
 
+import json
 
 # NOTE: Only for testing
 
 
 def query(driver: CCDRDriver, v: str):
     print("Q:", v)
-    db = driver.database
+    db = driver.database_accessor
 
     results = driver.get_raw_query_rankings(v)
 
@@ -32,13 +33,17 @@ def query(driver: CCDRDriver, v: str):
 
 if __name__ == "__main__":
     t = Interface(
-        processor=ECM(distance_threshold=5.),
+        processor=GTurbo(epsilon_b=0.001, epsilon_n=0, lam=200, beta=0.9995,
+                         alpha=0.95, max_age=200, r0=0.5, dimensions=1024),
         transformers={
             "query_type": TypeTransformer(modelname='neuralmind/bert-large-portuguese-cased'),
             "equipment": EquipmentTypeTransformer(modelname='neuralmind/bert-large-portuguese-cased'),
         },
         scoring_calculator=ScoringCalculator(),
     )
+
+    with open('config.json', 'r') as f:
+        config: MongoDatabaseConfig = json.load(f)
 
     driver = CCDRDriver(
         t,
@@ -48,8 +53,7 @@ if __name__ == "__main__":
             ranker=RankingModel()
         ),
         stringify_equipment_func=stringify,
-        database=DatabaseAcessor(),
-        config={},
+        database_accessor=MongoDatabaseAccessor(config),
     )
 
     driver.init_processor()

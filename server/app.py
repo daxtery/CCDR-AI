@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 
 from typing import List, Dict
 
-from server.database import DatabaseAcessor
+from server.database import MongoDatabaseAccessor, MongoDatabaseConfig
 from ccdr.ranking_model.ranking import RankingExtension, RankingModel
 from server.CCDRDriver import CCDRDriver
 from interference.clusters.ecm import ECM
@@ -26,6 +26,9 @@ interface = Interface(
     scoring_calculator=ScoringCalculator(),
 )
 
+with open('config.json', 'r') as f:
+    config: MongoDatabaseConfig = json.load(f)
+
 driver = CCDRDriver(
     interface,
     ranking=RankingExtension(
@@ -34,8 +37,7 @@ driver = CCDRDriver(
         ranker=RankingModel()
     ),
     stringify_equipment_func=stringify,
-    database=DatabaseAcessor(),
-    config={},
+    database_accessor=MongoDatabaseAccessor(config),
 )
 
 driver.init_processor()

@@ -1,8 +1,8 @@
 
 from ccdr.models.equipment import Equipment
 import re
-from server.database import DatabaseAcessor
-from ccdr.ranking_model.ranking import RankingExtension, RankingModel, hash_query
+from server.database import DatabaseAccessor
+from ccdr.ranking_model.ranking import RankingExtension, RankingModel
 from ccdr.models.user_query import UserQuery
 from ccdr.ccdr_interface import TransformersDict
 
@@ -20,6 +20,7 @@ logger.setLevel(logging.INFO)
 
 
 def remove_accents(word: str) -> str:
+    # https://pt.stackoverflow.com/questions/349415/como-remover-acento-em-python/349421
     normalized = ''.join(ch for ch in unicodedata.normalize(
         'NFKD', word) if not unicodedata.combining(ch))
 
@@ -57,6 +58,8 @@ def extract_type_with_regex(query: str) -> Optional[str]:
             no_accents_regex = remove_accents(regex)
             if re.match(no_accents_regex, query_lower) is not None:
                 return keyword
+    
+    return None
 
 
 class CCDRDriver:
@@ -66,33 +69,22 @@ class CCDRDriver:
         interface: Interface,
         stringify_equipment_func: Callable[[Equipment], str],
         ranking: RankingExtension,
-        database: DatabaseAcessor,
-        config: Dict[str, Any],
+        database_accessor: DatabaseAccessor,
     ):
         self.interface = interface
         self.ranking = ranking
-        self.config = config
         self.stringify_equipment_func = stringify_equipment_func
-        self.database = database
+        self.database_accessor = database_accessor
 
     def init_processor(self):
         logger.info("Initializing processor")
 
-        for tag, equipment in self.database.get_all_equipments():
-            instance = self.interface.try_create_instance_from_value(
-                "equipment", equipment)
-
-            assert instance
-            self.interface.add(tag, instance)
-
-            stringuified = self.stringify_equipment_func(equipment)
-            self.ranking.equipment_was_added(tag, stringuified)
+        for tag, equipment in self.database_accessor.get_all_equipments():
+            self._add_equipment_with_tag(equipment, tag)
 
         return self
 
-    def add_equipment_by_tag(self, tag: str):
-        equipment = self.database.get_equipment_by_id(tag)
-
+    def _add_equipment_with_tag(self, equipment: Equipment, tag: str):
         instance = self.interface.try_create_instance_from_value(
             "equipment", equipment)
 
@@ -101,6 +93,11 @@ class CCDRDriver:
 
         stringuified = self.stringify_equipment_func(equipment)
         self.ranking.equipment_was_added(tag, stringuified)
+
+    def add_equipment_by_tag(self, tag: str):
+        equipment = self.database_accessor.get_equipment_by_id(tag)
+
+        self._add_equipment_with_tag(equipment, tag)
 
     def get_query_results(self, query: str):
         rankings = self.get_raw_query_rankings(query)

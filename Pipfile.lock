@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ca0a821f3f92c05114cd7598756125bcac3fda3270c916a37e8c05868f2b4656"
+            "sha256": "d1c981393dff5fc57e91d90f2bc1ce5ab5da69af220af555b19a7e211da74da5"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -55,6 +55,14 @@
                 "sha256:fba402a4a47334742d782209a7c79bc448911afe1149d07bdabdf480b3e2f4b6"
             ],
             "version": "==8.0.1"
+        },
+        "dnspython": {
+            "hashes": [
+                "sha256:95d12f6ef0317118d2a1a6fc49aac65ffec7eb8087474158f42f26a639135216",
+                "sha256:e4a87f0b573201a0f3727fa18a516b055fd1107e0e5477cded4a2de497df1dd4"
+            ],
+            "index": "pypi",
+            "version": "==2.1.0"
         },
         "faiss-cpu": {
             "hashes": [
@@ -912,6 +920,7 @@
                 "sha256:99d4073b617d30288f569d3f13d2bd7548c3a7e4c8de87db09a9d29bb3a4a60c",
                 "sha256:dafc7639cde7f1b6e1acc0f457842a83e722ccca8eef5270af2d74792619a89f"
             ],
+            "markers": "python_version < '3.8'",
             "version": "==3.7.4.3"
         },
         "urllib3": {
@@ -933,6 +942,7 @@
                 "sha256:78b5b185f0e5763c26ca1e324373aadd49182ca90e825f7853f4b2509215dc0e",
                 "sha256:e11eefd162658ea59a60a0f6c7d493a7190ea4b9a85e335b33489d9f17e0245e"
             ],
+            "markers": "python_version >= '3'",
             "version": "==0.36.2"
         },
         "wrapt": {
@@ -1501,7 +1511,6 @@
                 "sha256:4b41f3967fce3af57cc7e94b888626c18bf37a083e3651ca8feeb66d492fef35",
                 "sha256:5c5d0a3b48ceee0b48485e0c26037c0acd7d29765ca3fbb5cb3831d347423220"
             ],
-            "markers": "os_name != 'nt'",
             "version": "==0.7.0"
         },
         "pycodestyle": {
@@ -1697,6 +1706,7 @@
                 "sha256:99d4073b617d30288f569d3f13d2bd7548c3a7e4c8de87db09a9d29bb3a4a60c",
                 "sha256:dafc7639cde7f1b6e1acc0f457842a83e722ccca8eef5270af2d74792619a89f"
             ],
+            "markers": "python_version < '3.8'",
             "version": "==3.7.4.3"
         },
         "wcwidth": {

@@ -9,6 +9,7 @@ scipy = "*"
 Flask = "*"
 pymongo = "*"
 tensorflow = "==2.4.1"
+dnspython = "*"
 
 [dev-packages]
 pandas = "*"
