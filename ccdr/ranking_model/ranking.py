@@ -2,16 +2,11 @@ from collections import defaultdict
 from typing import Any, Counter, Dict, Iterator, List, Sequence, Tuple, Iterable
 import tensorflow as tf
 from transformers import AutoTokenizer, TFBertModel
-import hashlib
 
 
 def argsort(seq: Sequence):
     # http://stackoverflow.com/questions/3071415/efficient-method-to-calculate-the-rank-vector-of-a-list-in-python
     return sorted(range(len(seq)), key=seq.__getitem__)
-
-
-def hash_query(query: str):
-    return hashlib.sha256(query.encode('utf-8')).hexdigest()
 
 
 class RankingExtension:
