@@ -15,7 +15,7 @@ from functools import reduce
 
 import logging
 
-logger = logging.getLogger('trigger_driver')
+logger = logging.getLogger('ccdr_driver')
 logger.setLevel(logging.INFO)
 
 
