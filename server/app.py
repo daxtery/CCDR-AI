@@ -53,8 +53,8 @@ def add_equipment(tag: str):
 
 @app.route('/search/<query>', methods=['GET'])
 def get_equipment(query: str):
-    results = driver.get_query_results(query)
-    return json.dumps(results)
+    rankings = driver.get_query_rankings(query)
+    return json.dumps(rankings)
 
 
 @app.route('/feedback/', methods=['POST'])

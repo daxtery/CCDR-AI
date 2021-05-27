@@ -99,11 +99,11 @@ class CCDRDriver:
 
         self._add_equipment_with_tag(equipment, tag)
 
-    def get_query_results(self, query: str):
-        rankings = self.get_raw_query_rankings(query)
+    def get_query_rankings(self, query: str):
+        rankings = self.get_query_rankings_with_score(query)
         return [tag for tag in rankings]
 
-    def get_raw_query_rankings(self, query: str):
+    def get_query_rankings_with_score(self, query: str):
         query_ = UserQuery(query)
 
         _type = extract_type_with_regex(query_.query)
