@@ -1,57 +1,54 @@
 from flask import Flask, request, jsonify
 
-from typing import List, Dict
+import logging
 
-from server.database import MongoDatabaseAccessor, MongoDatabaseConfig
-from ccdr.ranking_model.ranking import RankingExtension, RankingModel
-from server.CCDRDriver import CCDRDriver
-from interference.clusters.ecm import ECM
+from .extensions import scheduler
 
-from interference.interface import Interface
-from interference.scoring import ScoringCalculator
+import os
 
-from ccdr.models.equipment import stringify
-
-from ccdr.transformers.user_query_transformer import TypeTransformer
-from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer
-
-import json
-
-interface = Interface(
-    processor=ECM(distance_threshold=5.),
-    transformers={
-        "query_type": TypeTransformer(modelname='neuralmind/bert-large-portuguese-cased'),
-        "equipment": EquipmentTypeTransformer(modelname='neuralmind/bert-large-portuguese-cased'),
-    },
-    scoring_calculator=ScoringCalculator(),
-)
-
-with open('config.json', 'r') as f:
-    config: MongoDatabaseConfig = json.load(f)
-
-driver = CCDRDriver(
-    interface,
-    ranking=RankingExtension(
-        tokenizer_name="neuralmind/bert-base-portuguese-cased",
-        model_name="neuralmind/bert-base-portuguese-cased",
-        ranker=RankingModel()
-    ),
-    stringify_equipment_func=stringify,
-    database_accessor=MongoDatabaseAccessor(config),
-)
-
-driver.init_processor()
-
-app = Flask(__name__)
+# https://github.com/viniciuschiele/flask-apscheduler/blob/master/examples/application_factory/__init__.py
 
 
-@app.route('/equipment/<tag>', methods=['POST'])
-def add_equipment(tag: str):
-    driver.add_equipment_by_tag(tag)
-    return "Ok"
+def create_app():
+    """Create a new app instance."""
+
+    def is_debug_mode():
+        """Get app debug status."""
+        debug = os.environ.get("FLASK_DEBUG")
+        if not debug:
+            return os.environ.get("FLASK_ENV") == "development"
+        return debug.lower() not in ("0", "false", "no")
+
+    def is_werkzeug_reloader_process():
+        """Get werkzeug status."""
+        return os.environ.get("WERKZEUG_RUN_MAIN") == "true"
+
+    # pylint: disable=W0621
+    app = Flask(__name__)
+    scheduler.init_app(app)
+
+    logging.getLogger("apscheduler").setLevel(logging.INFO)
+
+    # pylint: disable=C0415, W0611
+    with app.app_context():
+
+        # pylint: disable=W0611
+        if is_debug_mode() and not is_werkzeug_reloader_process():
+            pass
+        else:
+            from . import ranking  # noqa: F401
+            scheduler.api_enabled = True
+            scheduler.start()
+
+        from . import search, equipment  # noqa: F401
+
+        app.register_blueprint(search.s_bp)
+        app.register_blueprint(equipment.eq_bp)
+
+        return app
 
 
-@app.route('/search/<query>', methods=['GET'])
-def get_equipment(query: str):
-    rankings = driver.get_query_rankings(query)
-    return json.dumps(rankings)
+app = create_app()
+
+if __name__ == "__main__":
+    app.run()

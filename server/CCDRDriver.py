@@ -132,3 +132,4 @@ class CCDRDriver:
     def learn_with_feedback(self):
         all_feedback = self.database_accessor.get_feedback()
         self.ranking.learn(all_feedback)
+        # TODO: maybe delete feedbacks here

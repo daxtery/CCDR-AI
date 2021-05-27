@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Counter, Dict, Iterator, List, Sequence, Tuple, Iterable
+from typing import Any, Callable, Counter, Dict, Iterator, List, Sequence, Tuple, Iterable
 import tensorflow as tf
 from transformers import AutoTokenizer, TFBertModel
 
@@ -10,7 +10,7 @@ def argsort(seq: Sequence):
 
 
 class RankingExtension:
-    def __init__(self, tokenizer_name: str, model_name: str, ranker: "RankingModel"):
+    def __init__(self, tokenizer_name: str, model_name: str, ranker_factory: Callable[[], "RankingModel"]):
         self.stringuified_equipment_tf_output: Dict[str, Any] = {}
 
         self.tokenizer = AutoTokenizer.from_pretrained(
@@ -19,7 +19,8 @@ class RankingExtension:
         self.model = TFBertModel.from_pretrained(
             model_name, from_pt=True)
 
-        self.ranker = ranker
+        self.ranker_factory = ranker_factory
+        self.ranker = ranker_factory()
 
     def _get_output(self, value: str):
         input_ = self.tokenizer.encode(value, return_tensors="tf")
@@ -49,6 +50,17 @@ class RankingExtension:
         }
 
     def learn(self, clicks: Dict[str, List[Tuple[str, bool]]]):
+        # NOTE: This method can run at the same time as a call to rank()
+        # Which means, we have to keep a self.ranker in "sync"
+        # The solution found was having a ranker factory and create one
+        # here; only when ready do we set it to self.ranker
+        new_ranker = self.ranker_factory()
+
+        # ...
+
+        new_ranker.train(clicks)
+
+        self.ranker = new_ranker
         pass
 
 
@@ -71,3 +83,6 @@ class RankingModel(tf.keras.Model):
         x = tf.concat([query_output, equipment_output], axis=-1)
         score = self.ranking_net(x)
         return score.numpy()[0][0]  # type: ignore
+
+    def train(self, clicks: Dict[str, List[Tuple[str, bool]]]):
+        pass

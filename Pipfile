@@ -10,6 +10,7 @@ Flask = "*"
 pymongo = "*"
 tensorflow = "==2.4.1"
 dnspython = "*"
+flask-apscheduler = "*"
 
 [dev-packages]
 pandas = "*"

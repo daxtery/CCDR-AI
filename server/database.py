@@ -254,6 +254,7 @@ class MongoDatabaseAccessor:
         for _, data in from_db:
             query, feedback = FeedbackMongoDataTransformer.transfrom_query_feedback_data_from_db(
                 data)
+            all_feedback.setdefault(query, [])
             all_feedback[query] += feedback
 
         return all_feedback
