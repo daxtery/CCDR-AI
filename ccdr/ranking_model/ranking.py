@@ -12,8 +12,6 @@ def argsort(seq: Sequence):
 class RankingExtension:
     def __init__(self, tokenizer_name: str, model_name: str, ranker: "RankingModel"):
         self.stringuified_equipment_tf_output: Dict[str, Any] = {}
-        self.query_feedback: Dict[str, Counter[str]] = defaultdict(
-            Counter)
 
         self.tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_name)
@@ -50,9 +48,8 @@ class RankingExtension:
             for index in indexes
         }
 
-    def feedback(self, clicks: Dict[str, List[str]]):
-        for query, clicked_tags in clicks.items():
-            self.query_feedback[query].update(clicked_tags)
+    def learn(self, clicks: Dict[str, List[Tuple[str, bool]]]):
+        pass
 
 
 class RankingModel(tf.keras.Model):

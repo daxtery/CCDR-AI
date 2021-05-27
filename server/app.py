@@ -55,10 +55,3 @@ def add_equipment(tag: str):
 def get_equipment(query: str):
     rankings = driver.get_query_rankings(query)
     return json.dumps(rankings)
-
-
-@app.route('/feedback/', methods=['POST'])
-def give_feedback():
-    data: Dict[str, List[str]] = request.json
-    driver.give_feedback(data)
-    return "Ok"
