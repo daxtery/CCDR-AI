@@ -1,4 +1,4 @@
-from typing import Any, Iterator, Sequence, Tuple, Dict, cast
+from typing import Any, Iterator, List, Sequence, Tuple, Dict, cast
 from typing_extensions import Protocol
 from typing_extensions import TypedDict
 from ccdr.models.equipment import Equipment, EquipmentArea, SocialEquipment, SportEquipment, HealthEquipment, CulturalEquipment, EducationEquipment, HospitalHealthEquipment, Escola
@@ -14,6 +14,9 @@ class DatabaseAccessor(Protocol):
         ...
 
     def get_all_equipments(self) -> Iterator[Tuple[str, Equipment]]:
+        ...
+
+    def get_feedback(self) -> Dict[str, List[Tuple[str, bool]]]:
         ...
 
 
@@ -64,6 +67,9 @@ class InMemoryDatabaseAccessor:
     def get_all_equipments(self):
         return InMemoryDatabaseAccessor.toy_equipments.items()
 
+    def get_feedback(self):
+        return {}
+
 
 class BaseEquipmentDataFromDB(TypedDict):
     area: EquipmentArea
@@ -71,18 +77,51 @@ class BaseEquipmentDataFromDB(TypedDict):
     extras: Dict[str, str]
 
 
+class FeedbackDataFromDB(TypedDict):
+    equipment_id: str
+    clicked: bool
+
+
+class QueryFeedbackDataFromDB(TypedDict):
+    query: str
+    feedbacks: List[FeedbackDataFromDB]
+
+
 class MongoDatabaseConfig(TypedDict):
     database_host: str
     database: str
 
 
-class MongoDatabaseAccessor:
+class EquipmentMongoDatabaseAccessor:
 
-    def __init__(self, config: MongoDatabaseConfig) -> None:
-        self.database = config["database"]
-        self.database_host = config["database_host"]
+    NAME = "equipment"
 
-    def _transfrom_equipment_data_from_db(self, data: BaseEquipmentDataFromDB) -> Equipment:
+    @staticmethod
+    def get_equipment_data_by_id(_id: str, database: database.Database) -> BaseEquipmentDataFromDB:
+        equipment_collection = database[EquipmentMongoDatabaseAccessor.NAME]
+
+        equipment_from_db = equipment_collection.find_one(
+            {"_id": ObjectId(_id)})
+
+        # FIXME: Is this good?
+        assert equipment_from_db
+
+        return equipment_from_db
+
+    @staticmethod
+    def get_all_equipment_data(database: database.Database) -> Iterator[Tuple[str, BaseEquipmentDataFromDB]]:
+        equipment_collection = database[EquipmentMongoDatabaseAccessor.NAME]
+
+        equipments_from_db = equipment_collection.find({})
+
+        for equipment in equipments_from_db:
+            yield str(equipment["_id"]), equipment
+
+
+class EquipmentMongoDataTransformer:
+
+    @staticmethod
+    def transfrom_equipment_data_from_db(data: BaseEquipmentDataFromDB) -> Equipment:
         area = data["area"]
         type_ = data["type"]
         extras = data["extras"]
@@ -140,29 +179,81 @@ class MongoDatabaseAccessor:
         else:  # We don't know what this is
             return Equipment(area, type_, extras)
 
-    def get_equipment_by_id(self, _id: str):
-        collection_name = "equipment"
 
+class FeedbackMongoDatabaseAccessor:
+
+    NAME = "queryfeedbacks"
+
+    @staticmethod
+    def get_query_feedback_data_by_id(_id: str, database: database.Database) -> QueryFeedbackDataFromDB:
+        collection = database[FeedbackMongoDatabaseAccessor.NAME]
+
+        from_db = collection.find_one(
+            {"_id": ObjectId(_id)})
+
+        # FIXME: Is this good?
+        assert from_db
+
+        return from_db
+
+    @staticmethod
+    def get_all_query_feedback_data(database: database.Database) -> Iterator[Tuple[str, QueryFeedbackDataFromDB]]:
+        collection = database[FeedbackMongoDatabaseAccessor.NAME]
+
+        from_db = collection.find({})
+
+        for item in from_db:
+            yield str(item["_id"]), item
+
+
+class FeedbackMongoDataTransformer:
+
+    @staticmethod
+    def transfrom_query_feedback_data_from_db(data: QueryFeedbackDataFromDB) -> Tuple[str, List[Tuple[str, bool]]]:
+        feedbacks = list(
+            map(
+                lambda f: (f["equipment_id"], f["clicked"]),
+                data["feedbacks"]
+            )
+        )
+
+        return (data["query"], feedbacks)
+
+
+class MongoDatabaseAccessor:
+
+    def __init__(self, config: MongoDatabaseConfig) -> None:
+        self.database = config["database"]
+        self.database_host = config["database_host"]
+
+    def get_equipment_by_id(self, _id: str):
         with MongoClient(self.database_host) as client:
             db = client[self.database]
-            equipment_collection = db[collection_name]
+            equipment_from_db = EquipmentMongoDatabaseAccessor.get_equipment_data_by_id(
+                _id, db)
 
-            equipment_from_db = equipment_collection.find_one(
-                {"_id": ObjectId(_id)})
-
-            # FIXME: Is this good?
-            assert equipment_from_db
-
-        return self._transfrom_equipment_data_from_db(equipment_from_db)
+        return EquipmentMongoDataTransformer.transfrom_equipment_data_from_db(equipment_from_db)
 
     def get_all_equipments(self):
-        collection_name = "equipment"
-
         with MongoClient(self.database_host) as client:
             db = client[self.database]
-            equipment_collection = db[collection_name]
+            equipments_from_db = EquipmentMongoDatabaseAccessor.get_all_equipment_data(
+                db)
 
-            equipments_from_db = equipment_collection.find({})
+        for _id, data in equipments_from_db:
+            yield _id, EquipmentMongoDataTransformer.transfrom_equipment_data_from_db(data)
 
-        for equipment in equipments_from_db:
-            yield str(equipment["_id"]), self._transfrom_equipment_data_from_db(equipment)
+    def get_feedback(self):
+        with MongoClient(self.database_host) as client:
+            db = client[self.database]
+            from_db = FeedbackMongoDatabaseAccessor.get_all_query_feedback_data(
+                db)
+
+        all_feedback: Dict[str, List[Tuple[str, bool]]] = {}
+
+        for _, data in from_db:
+            query, feedback = FeedbackMongoDataTransformer.transfrom_query_feedback_data_from_db(
+                data)
+            all_feedback[query] += feedback
+
+        return all_feedback

@@ -128,3 +128,7 @@ class CCDRDriver:
 
         rankings = self.ranking.rank(query, relevant_equipments_tags)
         return rankings
+
+    def learn_with_feedback(self):
+        all_feedback = self.database_accessor.get_feedback()
+        self.ranking.learn(all_feedback)
