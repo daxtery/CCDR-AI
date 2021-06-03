@@ -49,7 +49,7 @@ class RankingExtension:
         for tag in equipment_tags:
             assert tag in self.stringuified_equipment_tf_output
             score = self.ranker(
-                query_output, self.stringuified_equipment_tf_output[tag]
+                query_output, tag
             )
             scores.append(score)
 
@@ -103,13 +103,17 @@ class EquipmentRankingModel(tfrs.models.Model):
 
         return score.numpy()[0][0]
 
+    def train(self, clicks: Feedback):
+        
+        pass
+
 class RankingModel(tf.keras.Model):
 
     def __init__(self, unique_equipments_ids):
 
         super().__init__()
 
-        embedding_dim = 512
+        embedding_dim = 768
 
         self.equipment_embeddings = tf.keras.Sequential([
             tf.keras.layers.experimental.preprocessing.StringLookup(
@@ -128,14 +132,12 @@ class RankingModel(tf.keras.Model):
 
     def call(self, query_output, equipment_id):
 
-        equipment_embedding = self.equipment_embeddings(equipment_id)
+        equipment_embedding = tf.expand_dims(self.equipment_embeddings(equipment_id), axis=0)
 
         x = tf.concat([query_output, equipment_embedding], axis=1)
 
         return self.rankings(x)
 
-    def train(self, clicks: Feedback):
-        
-        pass
+    
 
 
