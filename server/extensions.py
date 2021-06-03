@@ -43,7 +43,7 @@ driver = CCDRDriver(
         model_name="neuralmind/bert-base-portuguese-cased",
         ranker_factory=ranker_factory
     ),
-    stringify_equipment_func=stringify,
+    ranking_stringify_equipment_func=stringify,
     database_accessor=MongoDatabaseAccessor(config),
 )
 

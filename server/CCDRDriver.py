@@ -67,13 +67,13 @@ class CCDRDriver:
     def __init__(
         self,
         interface: Interface,
-        stringify_equipment_func: Callable[[Equipment], str],
+        ranking_stringify_equipment_func: Callable[[Equipment], str],
         ranking: RankingExtension,
         database_accessor: DatabaseAccessor,
     ):
         self.interface = interface
         self.ranking = ranking
-        self.stringify_equipment_func = stringify_equipment_func
+        self.ranking_stringify_equipment_func = ranking_stringify_equipment_func
         self.database_accessor = database_accessor
 
     def init_processor(self):
@@ -91,7 +91,7 @@ class CCDRDriver:
         assert instance
         self.interface.add(tag, instance)
 
-        stringuified = self.stringify_equipment_func(equipment)
+        stringuified = self.ranking_stringify_equipment_func(equipment)
         self.ranking.equipment_was_added(tag, stringuified)
 
     def add_equipment_by_tag(self, tag: str):

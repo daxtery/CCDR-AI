@@ -52,7 +52,7 @@ if __name__ == "__main__":
             model_name="neuralmind/bert-base-portuguese-cased",
             ranker_factory=lambda: RankingModel(),
         ),
-        stringify_equipment_func=stringify,
+        ranking_stringify_equipment_func=stringify,
         database_accessor=MongoDatabaseAccessor(config),
     )
 
