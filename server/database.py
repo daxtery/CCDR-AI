@@ -19,6 +19,9 @@ class DatabaseAccessor(Protocol):
     def get_feedback(self) -> Dict[str, List[Tuple[str, float]]]:
         ...
 
+    def get_unique_ids(self) -> List[str]:
+        ...
+
 
 class InMemoryDatabaseAccessor:
 
@@ -95,6 +98,13 @@ class MongoDatabaseConfig(TypedDict):
 class EquipmentMongoDatabaseAccessor:
 
     NAME = "equipment"
+
+    @staticmethod
+    def get_equipment_ids(database: database.Database) -> List[str]:
+
+        equipment_collection = database[EquipmentMongoDatabaseAccessor.NAME]
+
+        return equipment_collection.distinct('_id')
 
     @staticmethod
     def get_equipment_data_by_id(_id: str, database: database.Database) -> BaseEquipmentDataFromDB:
@@ -242,6 +252,15 @@ class MongoDatabaseAccessor:
 
         for _id, data in equipments_from_db:
             yield _id, EquipmentMongoDataTransformer.transfrom_equipment_data_from_db(data)
+
+    def get_unique_ids(self):
+
+        with MongoClient(self.database_host) as client:
+
+            db = client[self.database]
+            from_db = EquipmentMongoDatabaseAccessor.get_equipment_ids(db)
+
+            return [str(id_obj) for id_obj in from_db]
 
     def get_feedback(self):
         with MongoClient(self.database_host) as client:
