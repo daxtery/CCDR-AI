@@ -56,6 +56,8 @@ class RankingExtension:
             )
             scores.append(score)
 
+        print(scores)
+
         indexes = argsort(scores)
 
         return {
@@ -102,10 +104,10 @@ class EquipmentRankingModel(tfrs.models.Model):
         return self.tasks(labels=inputs['scores'], predictions=ranking_predictions)
 
     def __call__(self, query_output, equipment_id) -> float:
+    
+        score = self.ranking_model(query_output, tf.convert_to_tensor(equipment_id))
 
-        score = self.ranking_model(query_output, equipment_id)
-
-        return score.numpy()[0][0]
+        return score.numpy()[0][0][0]
 
     def _convert_to_tensor(self, query, tokenizer, model):
 
@@ -126,7 +128,7 @@ class EquipmentRankingModel(tfrs.models.Model):
 
                 queries.append(key)
                 equipments_ids.append(value[0])
-                scores.append(1 - value[1])
+                scores.append(value[1])
 
         queries = [self._convert_to_tensor(query, tokenizer, model) for query in queries]
 
@@ -181,9 +183,21 @@ class RankingModel(tf.keras.Model):
 
     def call(self, query_output, equipment_id):
 
-        equipment_embedding = tf.expand_dims(self.equipment_embeddings(equipment_id), axis=1)
+        query_rank = len(tf.shape(query_output))
 
-        x = tf.concat([query_output, equipment_embedding], axis=1)
+        equipment_embedding = self.equipment_embeddings(equipment_id)
+
+        if query_rank == 3:
+
+            equipment_embedding = tf.expand_dims(equipment_embedding, axis=1)
+
+        else:
+
+            equipment_embedding = tf.expand_dims(equipment_embedding, axis=0)
+            equipment_embedding = tf.expand_dims(equipment_embedding, axis=0)
+            query_output = tf.expand_dims(query_output, axis=0)
+
+        x = tf.concat([query_output, equipment_embedding], axis=-1)
 
         return self.rankings(x)
 

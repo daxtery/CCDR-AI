@@ -4,7 +4,7 @@ from .extensions import driver, scheduler
 @scheduler.task(
     trigger="interval",
     id="feedback",
-    seconds=3600,
+    seconds=60,
     max_instances=1,
 )
 def learn_with_feedback():
