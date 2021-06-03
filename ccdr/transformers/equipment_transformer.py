@@ -2,7 +2,7 @@ from interference.transformers.transformer_pipeline import TransformerPipeline, 
 
 from sentence_transformers import SentenceTransformer
 
-from ccdr.models.equipment import Equipment
+from ccdr.models.equipment import Equipment, stringify
 
 
 class EquipmentTypeTransformer(TransformerPipeline[Equipment]):
@@ -11,4 +11,5 @@ class EquipmentTypeTransformer(TransformerPipeline[Equipment]):
         self.model = SentenceTransformer(modelname)
 
     def calculate_embedding(self, equipment: Equipment):
-        return self.model.encode(equipment.type_)
+        stringuified = stringify(equipment)
+        return self.model.encode(stringuified)

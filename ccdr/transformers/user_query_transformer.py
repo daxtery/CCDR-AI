@@ -11,5 +11,5 @@ class TypeTransformer(TransformerPipeline[str]):
     ):
         self.model = SentenceTransformer(modelname)
 
-    def calculate_embedding(self, _type: str):
-        return self.model.encode(_type)
+    def calculate_embedding(self, query: str):
+        return self.model.encode(query)

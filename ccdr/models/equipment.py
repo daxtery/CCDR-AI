@@ -11,6 +11,9 @@ class Equipment:
     type_: str
     extras: Dict[str, str] = field(repr=False)
 
+    def stringuify(self) -> str:
+        return self.__repr__()
+
 
 @dataclass
 class SocialEquipment(Equipment):
@@ -21,7 +24,7 @@ class SocialEquipment(Equipment):
 
         self.fins_lucrativos = fins_lucrativos
 
-    def __repr__(self) -> str:
+    def stringuify(self) -> str:
         _fins_lucrativos = "para fins lucrativos" if self.fins_lucrativos else "sem fins lucrativos"
         return f"{_fins_lucrativos}"
 
@@ -37,7 +40,7 @@ class CulturalEquipment(Equipment):
         self.acesso_gratuito = acesso_gratuito
         self.mobilidade_reduzida = mobilidade_reduzida
 
-    def __repr__(self) -> str:
+    def stringuify(self) -> str:
         _mobilidade_reduzida = "acesso mobilidade reduzida" if self.mobilidade_reduzida else "sem acesso mobilidade reduzida"
         _acesso_gratuito = "grátis" if self.acesso_gratuito else "pago"
 
@@ -47,6 +50,9 @@ class CulturalEquipment(Equipment):
 @dataclass
 class Escola:
     grau_ensino: str
+
+    def __repr__(self) -> str:
+        return self.grau_ensino
 
 
 @dataclass
@@ -58,7 +64,7 @@ class EducationEquipment(Equipment):
 
         self.escolas = escolas
 
-    def __repr__(self) -> str:
+    def stringuify(self) -> str:
         return "\n".join(map(str, self.escolas))
 
 
@@ -85,7 +91,7 @@ class SportEquipment(Equipment):
         self.mobilidade_reduzida_pratica = mobilidade_reduzida_pratica
         self.mobilidade_reduzida_assistencia = mobilidade_reduzida_assistencia
 
-    def __repr__(self) -> str:
+    def stringuify(self) -> str:
         _iluminado = "iluminado" if self.iluminado else "não iluminado"
         _mobilidade_reduzida_pratica = "mobilidade reduzida prática" if self.mobilidade_reduzida_pratica else "não possível mobilidade reduzida prática"
         _mobilidade_reduzida_assistencia = "mobilidade reduzida assistência" if self.mobilidade_reduzida_assistencia else "não possível mobilidade reduzida assistência"
@@ -124,9 +130,9 @@ class HospitalHealthEquipment(HealthEquipment):
         self.valencias = valencias
         self.especialidades = especialidades
 
-    def __repr__(self) -> str:
+    def stringuify(self) -> str:
         return f"{self.type_} {self.agrupamento_saude} {self.centro_hospitalar} {self.valencias} {self.especialidades}"
 
 
 def stringify(equipment: Equipment) -> str:
-    return str(equipment) + str(equipment.extras)
+    return equipment.stringuify() + str(equipment.extras)

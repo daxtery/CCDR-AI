@@ -16,7 +16,7 @@ class DatabaseAccessor(Protocol):
     def get_all_equipments(self) -> Iterator[Tuple[str, Equipment]]:
         ...
 
-    def get_feedback(self) -> Dict[str, List[Tuple[str, bool]]]:
+    def get_feedback(self) -> Dict[str, List[Tuple[str, float]]]:
         ...
 
 
@@ -79,7 +79,7 @@ class BaseEquipmentDataFromDB(TypedDict):
 
 class FeedbackDataFromDB(TypedDict):
     equipment_id: str
-    clicked: bool
+    score: float
 
 
 class QueryFeedbackDataFromDB(TypedDict):
@@ -209,10 +209,10 @@ class FeedbackMongoDatabaseAccessor:
 class FeedbackMongoDataTransformer:
 
     @staticmethod
-    def transfrom_query_feedback_data_from_db(data: QueryFeedbackDataFromDB) -> Tuple[str, List[Tuple[str, bool]]]:
+    def transfrom_query_feedback_data_from_db(data: QueryFeedbackDataFromDB) -> Tuple[str, List[Tuple[str, float]]]:
         feedbacks = list(
             map(
-                lambda f: (f["equipment_id"], f["clicked"]),
+                lambda f: (str(f["equipment_id"]), f["score"]),
                 data["feedbacks"]
             )
         )
@@ -249,12 +249,20 @@ class MongoDatabaseAccessor:
             from_db = FeedbackMongoDatabaseAccessor.get_all_query_feedback_data(
                 db)
 
-        all_feedback: Dict[str, List[Tuple[str, bool]]] = {}
+        all_feedback: Dict[str, Dict[str, float]] = {}
 
         for _, data in from_db:
             query, feedback = FeedbackMongoDataTransformer.transfrom_query_feedback_data_from_db(
                 data)
-            all_feedback.setdefault(query, [])
-            all_feedback[query] += feedback
+            all_feedback.setdefault(query, {})
+            for tag, score in feedback:
+                if tag in all_feedback[query]:
+                    all_feedback[query][tag] = max(
+                        all_feedback[query][tag], score)
+                else:
+                    all_feedback[query][tag] = score
 
-        return all_feedback
+        return {
+            query: list(scores.items())
+            for query, scores in all_feedback.items()
+        }

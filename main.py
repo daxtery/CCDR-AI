@@ -1,7 +1,7 @@
 from server.database import DatabaseAccessor, MongoDatabaseConfig, InMemoryDatabaseAccessor, MongoDatabaseAccessor
 from ccdr.ranking_model.ranking import RankingExtension, RankingModel
 from server.CCDRDriver import CCDRDriver
-from interference.clusters.gturbo import GTurbo
+from interference.clusters.ecm import ECM
 
 from interference.interface import Interface
 from interference.scoring import ScoringCalculator
@@ -11,30 +11,41 @@ from ccdr.models.equipment import stringify
 from ccdr.transformers.user_query_transformer import TypeTransformer
 from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer
 
-from pprint import pprint
-
 import json
+
+import sys
 
 # NOTE: Only for testing
 
 
 def query(driver: CCDRDriver, v: str):
     print("Q:", v)
+
     db = driver.database_accessor
 
     results = driver.get_query_rankings_with_score(v)
 
-    pretty_results = {
-        tag: (db.get_equipment_by_id(tag), score) for tag, score in results.items()
+    eqs = {
+        tag: db.get_equipment_by_id(tag)
+        for tag in results[0].keys()
     }
-    print("A:", end=None)
-    pprint(pretty_results)
+
+    pretty_results = {
+        tag: {
+            "data": str(eq) + str(eq.extras),
+            "stringuified": stringify(eq),
+            "rank score": str(results[0][tag]),
+            "match score": str(results[1][tag])
+        } for tag, eq in eqs.items()
+    }
+
+    print("A:", json.dumps(pretty_results,
+          ensure_ascii=False, sort_keys=False, indent=4))
 
 
 if __name__ == "__main__":
     t = Interface(
-        processor=GTurbo(epsilon_b=0.001, epsilon_n=0, lam=200, beta=0.9995,
-                         alpha=0.95, max_age=200, r0=0.5, dimensions=1024),
+        processor=ECM(8.),
         transformers={
             "query_type": TypeTransformer(modelname='neuralmind/bert-large-portuguese-cased'),
             "equipment": EquipmentTypeTransformer(modelname='neuralmind/bert-large-portuguese-cased'),
@@ -53,13 +64,22 @@ if __name__ == "__main__":
             ranker_factory=lambda: RankingModel(),
         ),
         ranking_stringify_equipment_func=stringify,
-        database_accessor=MongoDatabaseAccessor(config),
+        database_accessor=InMemoryDatabaseAccessor(),
     )
 
     driver.init_processor()
 
-    query(driver, "Piscina municipal de Estremoz")
-    query(driver, "Escola Secundária Rainha Santa Isabel")
-    query(driver, "Colegio da noite")
-    query(driver, "Colégio da noite")
-    query(driver, "Estadio da Luz")
+    original_stdout = sys.stdout
+
+    with open('out.txt', 'w') as f:
+        sys.stdout = f  # Change the standard output to the file we created.
+
+        query(driver, "Templo Romano")
+        query(driver, "Hospital Évora")
+        query(driver, "Universidade de Evora")
+        query(driver, "Evora Secundário")
+        query(driver, "Estadio da Luz")
+
+        sys.stdout = original_stdout  # Reset the standard output to its original value
+
+    pass

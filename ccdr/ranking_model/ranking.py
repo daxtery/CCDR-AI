@@ -9,6 +9,9 @@ def argsort(seq: Sequence):
     return sorted(range(len(seq)), key=seq.__getitem__)
 
 
+Feedback = Dict[str, List[Tuple[str, float]]]
+
+
 class RankingExtension:
     def __init__(self, tokenizer_name: str, model_name: str, ranker_factory: Callable[[], "RankingModel"]):
         self.stringuified_equipment_tf_output: Dict[str, Any] = {}
@@ -46,10 +49,10 @@ class RankingExtension:
 
         return {
             equipment_tags[index]: scores[index]
-            for index in indexes
+            for index in indexes[::-1]
         }
 
-    def learn(self, clicks: Dict[str, List[Tuple[str, bool]]]):
+    def learn(self, clicks: Feedback):
         # NOTE: This method can run at the same time as a call to rank()
         # Which means, we have to keep a self.ranker in "sync"
         # The solution found was having a ranker factory and create one
@@ -84,5 +87,5 @@ class RankingModel(tf.keras.Model):
         score = self.ranking_net(x)
         return score.numpy()[0][0]  # type: ignore
 
-    def train(self, clicks: Dict[str, List[Tuple[str, bool]]]):
+    def train(self, clicks: Feedback):
         pass
