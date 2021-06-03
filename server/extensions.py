@@ -33,9 +33,9 @@ with open('config.json', 'r') as f:
     config: MongoDatabaseConfig = json.load(f)
 
 
-def ranker_factory(unique_equipment_ids: List[str]):
+def ranker_factory(unique_equipment_ids: List[str], training_epochs, learning_rate):
 
-    return EquipmentRankingModel(unique_equipment_ids)
+    return EquipmentRankingModel(unique_equipment_ids, training_epochs, learning_rate)
 
 database_acessor = MongoDatabaseAccessor(config)
 
