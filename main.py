@@ -50,7 +50,7 @@ if __name__ == "__main__":
         ranking=RankingExtension(
             tokenizer_name="neuralmind/bert-base-portuguese-cased",
             model_name="neuralmind/bert-base-portuguese-cased",
-            ranker=RankingModel()
+            ranker_factory=lambda: RankingModel(),
         ),
         stringify_equipment_func=stringify,
         database_accessor=MongoDatabaseAccessor(config),
