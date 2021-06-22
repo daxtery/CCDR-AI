@@ -4,7 +4,6 @@ import re
 from server.database import DatabaseAccessor
 from ccdr.ranking_model.ranking import RankingExtension, RankingModel
 from ccdr.models.user_query import UserQuery
-from ccdr.ccdr_interface import TransformersDict
 
 from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, cast
 
