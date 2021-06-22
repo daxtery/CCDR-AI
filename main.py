@@ -1,7 +1,9 @@
 from server.database import DatabaseAccessor, MongoDatabaseConfig, InMemoryDatabaseAccessor, MongoDatabaseAccessor
-from ccdr.ranking_model.ranking import RankingExtension, RankingModel
+from ccdr.ranking_model.ranking import RankingExtension, RankingModel, EquipmentRankingModel
 from server.CCDRDriver import CCDRDriver
 from interference.clusters.ecm import ECM
+
+from typing import List
 
 from interference.interface import Interface
 from interference.scoring import ScoringCalculator
@@ -56,15 +58,21 @@ if __name__ == "__main__":
     with open('config.json', 'r') as f:
         config: MongoDatabaseConfig = json.load(f)
 
+    def ranker_factory(unique_equipment_ids: List[str], training_epochs, learning_rate):
+        return EquipmentRankingModel(unique_equipment_ids, training_epochs, learning_rate)
+
+    database_accessor = MongoDatabaseAccessor(config)
+
     driver = CCDRDriver(
         t,
         ranking=RankingExtension(
             tokenizer_name="neuralmind/bert-base-portuguese-cased",
             model_name="neuralmind/bert-base-portuguese-cased",
-            ranker_factory=lambda: RankingModel(),
+            ranker_factory=ranker_factory,
+            database_accessor = database_accessor,
         ),
         ranking_stringify_equipment_func=stringify,
-        database_accessor=InMemoryDatabaseAccessor(),
+        database_accessor=database_accessor,
     )
 
     driver.init_processor()
@@ -81,5 +89,3 @@ if __name__ == "__main__":
         query(driver, "Estadio da Luz")
 
         sys.stdout = original_stdout  # Reset the standard output to its original value
-
-    pass
