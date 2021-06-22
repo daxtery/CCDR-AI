@@ -18,7 +18,15 @@ Feedback = Dict[str, List[Tuple[str, float]]]
 
 
 class RankingExtension:
-    def __init__(self, database_accessor: MongoDatabaseAccessor, tokenizer_name: str, model_name: str, ranker_factory: Callable[[], "EquipmentRankingModel"], training_epochs: int = 150, learning_rate: float = 1e-3):
+    def __init__(
+        self,
+        database_accessor: MongoDatabaseAccessor,
+        tokenizer_name: str,
+        model_name: str,
+        ranker_factory: Callable[[List[str], int, float], "EquipmentRankingModel"],
+        training_epochs: int = 150,
+        learning_rate: float = 1e-3,
+    ):
         self.stringuified_equipment_tf_output: Dict[str, Any] = {}
 
         self.database_accessor = database_accessor
@@ -34,7 +42,8 @@ class RankingExtension:
         initial_ids = database_accessor.get_unique_ids()
 
         self.ranker_factory = ranker_factory
-        self.ranker = ranker_factory(initial_ids, training_epochs, learning_rate)
+        self.ranker = ranker_factory(
+            initial_ids, training_epochs, learning_rate)
 
     def _get_output(self, value: str):
         input_ = self.tokenizer.encode(value, return_tensors="tf")
@@ -56,8 +65,6 @@ class RankingExtension:
             )
             scores.append(score)
 
-        print(scores)
-
         indexes = argsort(scores)
 
         return {
@@ -73,12 +80,14 @@ class RankingExtension:
 
         ids = self.database_accessor.get_unique_ids()
 
-        new_ranker = self.ranker_factory(ids, self.training_epochs, self.learning_rate)
+        new_ranker = self.ranker_factory(
+            ids, self.training_epochs, self.learning_rate)
         # ...
 
         new_ranker.train(clicks, self.tokenizer, self.model)
 
         self.ranker = new_ranker
+
 
 class EquipmentRankingModel(tfrs.models.Model):
 
@@ -90,12 +99,12 @@ class EquipmentRankingModel(tfrs.models.Model):
 
         self.ranking_model: tf.keras.Model = RankingModel(unique_equipment_ids)
         self.tasks: tf.keras.layers.Layer = tfrs.tasks.Ranking(
-            loss = tf.keras.losses.MeanSquaredError(),
-            metrics =[tf.keras.metrics.RootMeanSquaredError()]
+            loss=tf.keras.losses.MeanSquaredError(),
+            metrics=[tf.keras.metrics.RootMeanSquaredError()]
         )
 
     def compute_loss(self, inputs: Dict[Text, tf.Tensor], training: bool) -> tf.Tensor:
-        
+
         queries = inputs['queries']
         equipment_ids = inputs['equipments_ids']
 
@@ -104,8 +113,9 @@ class EquipmentRankingModel(tfrs.models.Model):
         return self.tasks(labels=inputs['scores'], predictions=ranking_predictions)
 
     def __call__(self, query_output, equipment_id) -> float:
-    
-        score = self.ranking_model(query_output, tf.convert_to_tensor(equipment_id))
+
+        score = self.ranking_model(
+            query_output, tf.convert_to_tensor(equipment_id))
 
         return score.numpy()[0][0][0]
 
@@ -130,11 +140,14 @@ class EquipmentRankingModel(tfrs.models.Model):
                 equipments_ids.append(value[0])
                 scores.append(value[1])
 
-        queries = [self._convert_to_tensor(query, tokenizer, model) for query in queries]
+        queries = [self._convert_to_tensor(
+            query, tokenizer, model) for query in queries]
 
-        tf_dataset = tf.data.Dataset.from_tensor_slices({'queries': queries, 'equipments_ids': equipments_ids, 'scores': scores})
+        tf_dataset = tf.data.Dataset.from_tensor_slices(
+            {'queries': queries, 'equipments_ids': equipments_ids, 'scores': scores})
 
-        shuffled = tf_dataset.shuffle(100_000, seed=42, reshuffle_each_iteration=False)
+        shuffled = tf_dataset.shuffle(
+            100_000, seed=42, reshuffle_each_iteration=False)
         dataset_size = len(shuffled)
 
         train_size = int(0.8 * dataset_size)
@@ -146,17 +159,19 @@ class EquipmentRankingModel(tfrs.models.Model):
         return (train, test)
 
     def train(self, clicks: Feedback, tokenizer, model):
-        
+
         train, test = self._build_dataset(clicks, tokenizer, model)
-        
+
         cached_train = train.shuffle(100_000).batch(8192).cache()
         cached_test = test.batch(4096).cache()
 
-        self.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=self.learning_rate))
+        self.compile(optimizer=tf.keras.optimizers.Adagrad(
+            learning_rate=self.learning_rate))
 
         self.fit(cached_train, epochs=self.training_epochs)
 
         self.evaluate(cached_test, return_dict=True)
+
 
 class RankingModel(tf.keras.Model):
 
@@ -169,7 +184,8 @@ class RankingModel(tf.keras.Model):
         self.equipment_embeddings = tf.keras.Sequential([
             tf.keras.layers.experimental.preprocessing.StringLookup(
                 vocabulary=unique_equipments_ids, mask_token=None),
-            tf.keras.layers.Embedding(len(unique_equipments_ids) + 1, embedding_dim)
+            tf.keras.layers.Embedding(
+                len(unique_equipments_ids) + 1, embedding_dim)
         ])
 
         self.rankings = tf.keras.Sequential([
@@ -200,7 +216,3 @@ class RankingModel(tf.keras.Model):
         x = tf.concat([query_output, equipment_embedding], axis=-1)
 
         return self.rankings(x)
-
-    
-
-
