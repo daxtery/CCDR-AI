@@ -11,6 +11,7 @@ pymongo = "*"
 tensorflow = "==2.4.1"
 dnspython = "*"
 flask-apscheduler = "*"
+tensorflow-recommenders = "*"
 
 [dev-packages]
 pandas = "*"
