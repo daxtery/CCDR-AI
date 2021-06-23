@@ -5,8 +5,6 @@ from ccdr.models.equipment import Equipment, EquipmentArea, SocialEquipment, Spo
 from pymongo import database, MongoClient
 from bson.objectid import ObjectId
 
-from dataclasses import asdict
-
 
 class DatabaseAccessor(Protocol):
 
@@ -23,61 +21,12 @@ class DatabaseAccessor(Protocol):
         ...
 
 
-class InMemoryDatabaseAccessor:
-
-    toy_equipments: Dict[str, Equipment] = {
-        "609964dc33c8033e28f0c1f9": SportEquipment(
-            type_="Estádio",
-            extras={"nome": "Estádio da Luz"},
-            iluminado=True,
-            tipo_piso="terra batida",
-            mobilidade_reduzida_pratica=True,
-            mobilidade_reduzida_assistencia=True,
-        ),
-        "609964dc33c8033e28f0c1fa": HospitalHealthEquipment(
-            extras={"nome": "Centro de Saúde de Estremoz"},
-            agrupamento_saude="Centro de Saúde Estremoz",
-            centro_hospitalar="Hospital do Espírito Santo de Évora",
-            valencias=["Radiologia"],
-            especialidades=[],
-        ),
-        "609964dc33c8033e28f0c1fb": EducationEquipment(
-            type_="Universidade",
-            extras={"nome": "Universidade de Évora"},
-            escolas=[Escola("Universidade")],
-        ),
-        "609964dc33c8033e28f0c1fc": EducationEquipment(
-            type_="Escola",
-            escolas=[Escola("Secundário"), Escola("Básico")],
-            extras={"nome": "Agrupamento de Escolas Gabriel Pereira"},
-        ),
-        "609964dc33c8033e28f0c1fd": SocialEquipment(
-            type_="Centro de dia",
-            extras={"nome": "Centro Social Nossa Senhora Auxiliadora"},
-            fins_lucrativos=True,
-        ),
-        "609964dc33c8033e28f0c1fe": CulturalEquipment(
-            type_="Templo",
-            acesso_gratuito=True,
-            mobilidade_reduzida=True,
-            extras={"nome": "Templo Romano Évora"},
-        ),
-    }
-
-    def get_equipment_by_id(self, _id: str):
-        return InMemoryDatabaseAccessor.toy_equipments[_id]
-
-    def get_all_equipments(self):
-        return InMemoryDatabaseAccessor.toy_equipments.items()
-
-    def get_feedback(self):
-        return {}
-
-
 class BaseEquipmentDataFromDB(TypedDict):
+    name: str
     area: EquipmentArea
     type: str
     extras: Dict[str, str]
+    equipmentDetails: Dict[str, Any]
 
 
 class FeedbackDataFromDB(TypedDict):
@@ -134,23 +83,26 @@ class EquipmentMongoDataTransformer:
     def transfrom_equipment_data_from_db(data: BaseEquipmentDataFromDB) -> Equipment:
         area = data["area"]
         type_ = data["type"]
+        name = data["name"]
         extras = data["extras"]
 
-        data_ = cast(Dict[str, Any], data)
+        data_ = cast(Dict[str, Any], data["equipmentDetails"])
 
         if area == "Social":
             return SocialEquipment(
-                type_,
-                extras,
-                data_["fins lucrativos"]
+                name=name,
+                type_=type_,
+                extras=extras,
+                fins_lucrativos=data_["fins lucrativos"],
             )
 
         if area == "Cultura":
             return CulturalEquipment(
-                type_,
-                extras,
-                data_["acesso gratuito"],
-                data_["mobilidade reduzida"]
+                name=name,
+                type_=type_,
+                extras=extras,
+                acesso_gratuito=data_["acesso gratuito"],
+                mobilidade_reduzida=data_["mobilidade reduzida"],
             )
 
         if area == "Educação":
@@ -161,33 +113,46 @@ class EquipmentMongoDataTransformer:
                 )
             )
 
-            return EducationEquipment(type_, extras, schools)
+            return EducationEquipment(name, type_, extras, schools)
 
         if area == "Desporto":
             return SportEquipment(
-                type_,
-                extras,
-                data_["iluminado"],
-                data_["tipo piso"],
-                data_["mobilidade reduzida prática"],
-                data_["mobilidade reduzida assistência"],
+                name=name,
+                type_=type_,
+                extras=extras,
+                iluminado=data_["iluminado"],
+                tipo_piso=data_["tipo piso"],
+                mobilidade_reduzida_pratica=data_[
+                    "mobilidade reduzida prática"],
+                mobilidade_reduzida_assistencia=data_[
+                    "mobilidade reduzida assistência"],
             )
 
         if area == "Saúde":
             if type_ == "Saúde Hospitalar":
                 return HospitalHealthEquipment(
-                    extras,
-                    data_["agrupamento saude"],
-                    data_["centro hospitalar"],
-                    data_["valências"],
-                    data_["especialidades"],
+                    name=name,
+                    extras=extras,
+                    agrupamento_saude=data_["agrupamento saude"],
+                    centro_hospitalar=data_["centro hospitalar"],
+                    valencias=data_["valências"],
+                    especialidades=data_["especialidades"],
                 )
 
             else:
-                return HealthEquipment(type_, extras)
+                return HealthEquipment(
+                    name=name,
+                    type_=type_,
+                    extras=extras,
+                )
 
         else:  # We don't know what this is
-            return Equipment(area, type_, extras)
+            return Equipment(
+                area=area,
+                type_=type_,
+                name=name,
+                extras=extras
+            )
 
 
 class FeedbackMongoDatabaseAccessor:

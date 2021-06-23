@@ -9,24 +9,25 @@ EquipmentArea = Literal["Social", "Cultura", "Educação", "Desporto", "Saúde"]
 class Equipment:
     area: EquipmentArea
     type_: str
+    name: str
     extras: Dict[str, str] = field(repr=False)
 
     def stringuify(self) -> str:
-        return self.__repr__()
+        return f"{self.name} {self.type_} {self.area}"
 
 
 @dataclass
 class SocialEquipment(Equipment):
     fins_lucrativos: bool
 
-    def __init__(self, type_: str, extras: Dict[str, str], fins_lucrativos: bool) -> None:
-        super().__init__("Social", type_, extras)
+    def __init__(self, name: str, type_: str, extras: Dict[str, str], fins_lucrativos: bool) -> None:
+        super().__init__("Social", type_, name, extras)
 
         self.fins_lucrativos = fins_lucrativos
 
     def stringuify(self) -> str:
         _fins_lucrativos = "para fins lucrativos" if self.fins_lucrativos else "sem fins lucrativos"
-        return f"{_fins_lucrativos}"
+        return f"{self.name} {_fins_lucrativos}"
 
 
 @dataclass
@@ -34,8 +35,8 @@ class CulturalEquipment(Equipment):
     acesso_gratuito: bool
     mobilidade_reduzida: bool
 
-    def __init__(self, type_: str, extras: Dict[str, str], acesso_gratuito: bool, mobilidade_reduzida: bool) -> None:
-        super().__init__("Cultura", type_, extras)
+    def __init__(self, name: str, type_: str, extras: Dict[str, str], acesso_gratuito: bool, mobilidade_reduzida: bool) -> None:
+        super().__init__("Cultura", type_, name, extras)
 
         self.acesso_gratuito = acesso_gratuito
         self.mobilidade_reduzida = mobilidade_reduzida
@@ -44,7 +45,7 @@ class CulturalEquipment(Equipment):
         _mobilidade_reduzida = "acesso mobilidade reduzida" if self.mobilidade_reduzida else "sem acesso mobilidade reduzida"
         _acesso_gratuito = "grátis" if self.acesso_gratuito else "pago"
 
-        return f"{_mobilidade_reduzida} {_acesso_gratuito}"
+        return f"{self.name} {_mobilidade_reduzida} {_acesso_gratuito}"
 
 
 @dataclass
@@ -59,13 +60,13 @@ class Escola:
 class EducationEquipment(Equipment):
     escolas: List[Escola]
 
-    def __init__(self, type_: str, extras: Dict[str, str], escolas: List[Escola]) -> None:
-        super().__init__("Educação", type_, extras)
+    def __init__(self, name: str, type_: str, extras: Dict[str, str], escolas: List[Escola]) -> None:
+        super().__init__("Educação", type_, name, extras)
 
         self.escolas = escolas
 
     def stringuify(self) -> str:
-        return "\n".join(map(str, self.escolas))
+        return self.name + "\n".join(map(str, self.escolas))
 
 
 @dataclass
@@ -76,7 +77,7 @@ class SportEquipment(Equipment):
     mobilidade_reduzida_assistencia: bool
 
     def __init__(
-        self,
+        self, name: str,
         type_: str,
         extras: Dict[str, str],
         iluminado: bool,
@@ -84,7 +85,7 @@ class SportEquipment(Equipment):
         mobilidade_reduzida_pratica: bool,
         mobilidade_reduzida_assistencia: bool,
     ) -> None:
-        super().__init__("Desporto", type_, extras)
+        super().__init__("Desporto", type_, name, extras)
 
         self.iluminado = iluminado
         self.tipo_piso = tipo_piso
@@ -96,16 +97,18 @@ class SportEquipment(Equipment):
         _mobilidade_reduzida_pratica = "mobilidade reduzida prática" if self.mobilidade_reduzida_pratica else "não possível mobilidade reduzida prática"
         _mobilidade_reduzida_assistencia = "mobilidade reduzida assistência" if self.mobilidade_reduzida_assistencia else "não possível mobilidade reduzida assistência"
 
-        return f"{self.type_} {self.iluminado} {_iluminado} {_mobilidade_reduzida_pratica} {_mobilidade_reduzida_assistencia}"
+        return f"{self.name} {self.type_} {self.iluminado} {_iluminado} {_mobilidade_reduzida_pratica} {_mobilidade_reduzida_assistencia}"
 
 
 @dataclass
 class HealthEquipment(Equipment):
     def __init__(
         self,
-        type_: str, extras: Dict[str, str],
+        name: str,
+        type_: str,
+        extras: Dict[str, str],
     ) -> None:
-        super().__init__("Saúde", type_, extras)
+        super().__init__("Saúde", type_, name, extras)
 
 
 @dataclass
@@ -117,13 +120,14 @@ class HospitalHealthEquipment(HealthEquipment):
 
     def __init__(
         self,
+        name: str,
         extras: Dict[str, str],
         agrupamento_saude: str,
         centro_hospitalar: str,
         valencias: List[str],
         especialidades: List[str],
     ) -> None:
-        super().__init__("Saúde Hospitalar", extras)
+        super().__init__("Saúde Hospitalar", name, extras)
 
         self.agrupamento_saude = agrupamento_saude
         self.centro_hospitalar = centro_hospitalar
@@ -131,7 +135,7 @@ class HospitalHealthEquipment(HealthEquipment):
         self.especialidades = especialidades
 
     def stringuify(self) -> str:
-        return f"{self.type_} {self.agrupamento_saude} {self.centro_hospitalar} {self.valencias} {self.especialidades}"
+        return f"{self.name} {self.agrupamento_saude} {self.centro_hospitalar} {','.join(self.valencias)} {','.join(self.especialidades)}"
 
 
 def stringify(equipment: Equipment) -> str:
