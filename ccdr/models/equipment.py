@@ -1,3 +1,4 @@
+import json
 from typing import List, Dict, Union
 from typing_extensions import Literal, Final
 from dataclasses import dataclass, asdict, field
@@ -139,4 +140,4 @@ class HospitalHealthEquipment(HealthEquipment):
 
 
 def stringify(equipment: Equipment) -> str:
-    return equipment.stringuify() + str(equipment.extras)
+    return equipment.stringuify() + " ".join(list(equipment.extras.values()))
