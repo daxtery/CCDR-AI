@@ -175,18 +175,19 @@ class EquipmentRankingModel(tfrs.models.Model):
 
 class RankingModel(tf.keras.Model):
 
-    def __init__(self, unique_equipments_ids):
+    def __init__(self, unique_equipments_ids: List):
 
         super().__init__()
 
         embedding_dim = 768
 
-        self.equipment_embeddings = tf.keras.Sequential([
-            tf.keras.layers.experimental.preprocessing.StringLookup(
-                vocabulary=unique_equipments_ids, mask_token=None),
-            tf.keras.layers.Embedding(
-                len(unique_equipments_ids) + 1, embedding_dim)
-        ])
+        self.equipment_embeddings = None if len(unique_equipments_ids) == 0 else\
+            tf.keras.Sequential([
+                tf.keras.layers.experimental.preprocessing.StringLookup(
+                    vocabulary=unique_equipments_ids, mask_token=None),
+                tf.keras.layers.Embedding(
+                    len(unique_equipments_ids) + 1, embedding_dim)
+            ])
 
         self.rankings = tf.keras.Sequential([
 
@@ -198,6 +199,9 @@ class RankingModel(tf.keras.Model):
         ])
 
     def call(self, query_output, equipment_id):
+
+        if self.equipment_embeddings is None:
+            return []
 
         query_rank = len(tf.shape(query_output))
 
