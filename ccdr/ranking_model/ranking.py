@@ -117,6 +117,9 @@ class EquipmentRankingModel(tfrs.models.Model):
         score = self.ranking_model(
             query_output, tf.convert_to_tensor(equipment_id))
 
+        if score is None:
+            return 0.
+
         return score.numpy()[0][0][0]
 
     def _convert_to_tensor(self, query, tokenizer, model):
@@ -201,7 +204,7 @@ class RankingModel(tf.keras.Model):
     def call(self, query_output, equipment_id):
 
         if self.equipment_embeddings is None:
-            return []
+            return None
 
         query_rank = len(tf.shape(query_output))
 
