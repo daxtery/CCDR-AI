@@ -1,7 +1,7 @@
-from typing import Any, Iterator, List, Sequence, Tuple, Dict, cast
+from typing import Any, Iterator, List, Sequence, Tuple, Dict, TypeVar, cast
 from typing_extensions import Protocol
 from typing_extensions import TypedDict
-from ccdr.models.equipment import Equipment, EquipmentArea, SocialEquipment, SportEquipment, HealthEquipment, CulturalEquipment, EducationEquipment, HospitalHealthEquipment, Escola
+from ccdr.models.equipment import Equipment, EquipmentArea, Organizacao, SocialEquipment, SportEquipment, HealthEquipment, CulturalEquipment, EducationEquipment, HospitalHealthEquipment, Escola
 from pymongo import database, MongoClient
 from bson.objectid import ObjectId
 
@@ -77,6 +77,13 @@ class EquipmentMongoDatabaseAccessor:
             yield str(equipment["_id"]), equipment
 
 
+T = TypeVar('T')
+
+
+def value_or_default(data: Dict[str, Any], key: str, default: T) -> T:
+    return data.get(key, default)  # type: ignore
+
+
 class EquipmentMongoDataTransformer:
 
     @staticmethod
@@ -94,6 +101,11 @@ class EquipmentMongoDataTransformer:
                 type_=type_,
                 extras=extras,
                 fins_lucrativos=data_["fins lucrativos"],
+                capacidade=value_or_default(data_, "capacidade", 0),
+                numero_de_utentes=value_or_default(
+                    data_, "numero de utentes", 0),
+                organizacao=value_or_default(
+                    data_, "organizacao", Organizacao()),
             )
 
         if area == "Cultura":
@@ -108,7 +120,12 @@ class EquipmentMongoDataTransformer:
         if area == "Educação":
             schools = list(
                 map(
-                    lambda dto: Escola(dto["grau ensino"]),
+                    lambda dto: Escola(
+                        dto["grau ensino"],
+                        capacidade=value_or_default(dto, "capacidade", 0),
+                        numero_de_alunos=value_or_default(
+                            dto, "numero de alunos", 0)
+                    ),
                     data_["escolas"]
                 )
             )
@@ -126,6 +143,9 @@ class EquipmentMongoDataTransformer:
                     "mobilidade reduzida prática"],
                 mobilidade_reduzida_assistencia=data_[
                     "mobilidade reduzida assistência"],
+                capacidade=value_or_default(data_, "capacidade", 0),
+                instalacoes_apoio=value_or_default(
+                    data_, "instalacoes apoio", []),
             )
 
         if area == "Saúde":
@@ -137,6 +157,11 @@ class EquipmentMongoDataTransformer:
                     centro_hospitalar=data_["centro hospitalar"],
                     valencias=data_["valências"],
                     especialidades=data_["especialidades"],
+                    numero_de_utentes=value_or_default(
+                        data_, "numero de utentes", 0),
+                    numero_de_equipamentos_por_especialidade=value_or_default(
+                        data_, "numero de equipamentos por especialidade", {}),
+                    unidades=value_or_default(data_, "unidades", [])
                 )
 
             else:
@@ -144,6 +169,8 @@ class EquipmentMongoDataTransformer:
                     name=name,
                     type_=type_,
                     extras=extras,
+                    numero_de_utentes=value_or_default(
+                        data_, "numero de utentes", 0),
                 )
 
         else:  # We don't know what this is
