@@ -64,7 +64,7 @@ class CCDRDriver:
 
         assert instance
 
-        matches = self.interface.get_matches_for(instance)
+        matches = self.interface.get_scorings_for(instance)
 
         relevant_equipments_and_scores: Dict[str, float] = {
             scoring.scored_tag: scoring.score

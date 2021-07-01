@@ -11,10 +11,8 @@ from interference.clusters.ecm import ECM
 from interference.interface import Interface
 from interference.scoring import ScoringCalculator
 
-from ccdr.models.equipment import stringify
-
 from ccdr.transformers.user_query_transformer import TypeTransformer
-from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer
+from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer, stringify
 
 import json
 

@@ -1,0 +1,111 @@
+Q: Templo Romano
+A: {
+    "60d373d92811662bd83a7c1c": {
+        "data": "Equipment(area='desporto', type_='O Estádio da Luz ou Estádio do Sport Lisboa e Benfica (nome oficial) é um estádio de futebol de Categoria 4 localizado na freguesia de São Domingos de Benfica, cidade de Lisboa, em Portugal. O estádio é também conhecido pelos benfiquistas como \"A Catedral\".', name='Estádio da Luz', horario=None, numero_de_equipamentos=None, localizacao=None, details=SportDetails(iluminado='', tipo_piso=None, mobilidade_reduzida_pratica=None, mobilidade_reduzida_assistencia=None, capacidade=10000, instalacoes_apoio=[])){}",
+        "stringuified": "Estádio da Luz não iluminado com capacidade 10000",
+        "rank score": "-0.21393897",
+        "match score": "0.6665228009223938"
+    },
+    "60d372a52811662bd83a7c19": {
+        "data": "Equipment(area='social', type_='A IISBA – Incubadora de Inovação Social do Baixo Alentejo é um espaço facilitador da partilha de ideias e de criação de respostas sociais inovadoras e concertadas, é mais do que um espaço físico, pois propaga por todo o território do Baixo Alentejo um espírito inovador, fazendo chegar a todos os espaços as boas práticas, incentivando os agentes locais e as populações a tomarem nas suas mãos, na sua capacidade de empreender, o futuro da região.', name='Incubadora de Inovação Social do Baixo Alentejo', horario=None, numero_de_equipamentos=None, localizacao=None, details=SocialDetails(fins_lucrativos='', capacidade='', numero_de_utentes='', organizacao=Organizacao(nome=''))){}",
+        "stringuified": "Incubadora de Inovação Social do Baixo Alentejo sem fins lucrativos capacidade  utentes",
+        "rank score": "-0.22228116",
+        "match score": "0.5818077921867371"
+    },
+    "60d374182811662bd83a7c1d": {
+        "data": "Equipment(area='desporto', type_='O Estádio do Dragão é um estádio de futebol, localizado na freguesia de Campanhã, cidade do Porto, propriedade do FC Porto, sendo neste recinto que a equipa de futebol joga as suas partidas em casa. O estádio foi inaugurado a 16 de novembro de 2003, e tem uma capacidade para 50 033 espetadores', name='Estádio do dragão', horario=None, numero_de_equipamentos=None, localizacao=None, details=SportDetails(iluminado=None, tipo_piso=None, mobilidade_reduzida_pratica=None, mobilidade_reduzida_assistencia=None, capacidade=100, instalacoes_apoio=None)){}",
+        "stringuified": "Estádio do dragão com capacidade 100",
+        "rank score": "-0.2506731",
+        "match score": "0.6933126449584961"
+    }
+}
+Q: Hospital Évora
+A: {
+    "60d373d92811662bd83a7c1c": {
+        "data": "Equipment(area='desporto', type_='O Estádio da Luz ou Estádio do Sport Lisboa e Benfica (nome oficial) é um estádio de futebol de Categoria 4 localizado na freguesia de São Domingos de Benfica, cidade de Lisboa, em Portugal. O estádio é também conhecido pelos benfiquistas como \"A Catedral\".', name='Estádio da Luz', horario=None, numero_de_equipamentos=None, localizacao=None, details=SportDetails(iluminado='', tipo_piso=None, mobilidade_reduzida_pratica=None, mobilidade_reduzida_assistencia=None, capacidade=10000, instalacoes_apoio=[])){}",
+        "stringuified": "Estádio da Luz não iluminado com capacidade 10000",
+        "rank score": "-0.0065458454",
+        "match score": "0.7115464210510254"
+    },
+    "60d372a52811662bd83a7c19": {
+        "data": "Equipment(area='social', type_='A IISBA – Incubadora de Inovação Social do Baixo Alentejo é um espaço facilitador da partilha de ideias e de criação de respostas sociais inovadoras e concertadas, é mais do que um espaço físico, pois propaga por todo o território do Baixo Alentejo um espírito inovador, fazendo chegar a todos os espaços as boas práticas, incentivando os agentes locais e as populações a tomarem nas suas mãos, na sua capacidade de empreender, o futuro da região.', name='Incubadora de Inovação Social do Baixo Alentejo', horario=None, numero_de_equipamentos=None, localizacao=None, details=SocialDetails(fins_lucrativos='', capacidade='', numero_de_utentes='', organizacao=Organizacao(nome=''))){}",
+        "stringuified": "Incubadora de Inovação Social do Baixo Alentejo sem fins lucrativos capacidade  utentes",
+        "rank score": "-0.026619583",
+        "match score": "0.6833668947219849"
+    },
+    "60d374182811662bd83a7c1d": {
+        "data": "Equipment(area='desporto', type_='O Estádio do Dragão é um estádio de futebol, localizado na freguesia de Campanhã, cidade do Porto, propriedade do FC Porto, sendo neste recinto que a equipa de futebol joga as suas partidas em casa. O estádio foi inaugurado a 16 de novembro de 2003, e tem uma capacidade para 50 033 espetadores', name='Estádio do dragão', horario=None, numero_de_equipamentos=None, localizacao=None, details=SportDetails(iluminado=None, tipo_piso=None, mobilidade_reduzida_pratica=None, mobilidade_reduzida_assistencia=None, capacidade=100, instalacoes_apoio=None)){}",
+        "stringuified": "Estádio do dragão com capacidade 100",
+        "rank score": "-0.042162254",
+        "match score": "0.7178512811660767"
+    }
+}
+Q: Universidade de Evora
+A: {
+    "60d373d92811662bd83a7c1c": {
+        "data": "Equipment(area='desporto', type_='O Estádio da Luz ou Estádio do Sport Lisboa e Benfica (nome oficial) é um estádio de futebol de Categoria 4 localizado na freguesia de São Domingos de Benfica, cidade de Lisboa, em Portugal. O estádio é também conhecido pelos benfiquistas como \"A Catedral\".', name='Estádio da Luz', horario=None, numero_de_equipamentos=None, localizacao=None, details=SportDetails(iluminado='', tipo_piso=None, mobilidade_reduzida_pratica=None, mobilidade_reduzida_assistencia=None, capacidade=10000, instalacoes_apoio=[])){}",
+        "stringuified": "Estádio da Luz não iluminado com capacidade 10000",
+        "rank score": "-0.18412",
+        "match score": "0.7290173172950745"
+    },
+    "60d374182811662bd83a7c1d": {
+        "data": "Equipment(area='desporto', type_='O Estádio do Dragão é um estádio de futebol, localizado na freguesia de Campanhã, cidade do Porto, propriedade do FC Porto, sendo neste recinto que a equipa de futebol joga as suas partidas em casa. O estádio foi inaugurado a 16 de novembro de 2003, e tem uma capacidade para 50 033 espetadores', name='Estádio do dragão', horario=None, numero_de_equipamentos=None, localizacao=None, details=SportDetails(iluminado=None, tipo_piso=None, mobilidade_reduzida_pratica=None, mobilidade_reduzida_assistencia=None, capacidade=100, instalacoes_apoio=None)){}",
+        "stringuified": "Estádio do dragão com capacidade 100",
+        "rank score": "-0.2319116",
+        "match score": "0.7332143187522888"
+    },
+    "60d372a52811662bd83a7c19": {
+        "data": "Equipment(area='social', type_='A IISBA – Incubadora de Inovação Social do Baixo Alentejo é um espaço facilitador da partilha de ideias e de criação de respostas sociais inovadoras e concertadas, é mais do que um espaço físico, pois propaga por todo o território do Baixo Alentejo um espírito inovador, fazendo chegar a todos os espaços as boas práticas, incentivando os agentes locais e as populações a tomarem nas suas mãos, na sua capacidade de empreender, o futuro da região.', name='Incubadora de Inovação Social do Baixo Alentejo', horario=None, numero_de_equipamentos=None, localizacao=None, details=SocialDetails(fins_lucrativos='', capacidade='', numero_de_utentes='', organizacao=Organizacao(nome=''))){}",
+        "stringuified": "Incubadora de Inovação Social do Baixo Alentejo sem fins lucrativos capacidade  utentes",
+        "rank score": "-0.25212407",
+        "match score": "0.7429038286209106"
+    }
+}
+Q: Evora Secundário
+A: {
+    "60d372442811662bd83a7c17": {
+        "data": "Equipment(area='desporto', type_='Rua Engenheiro André Brito Tavares, Frac. F, Estremoz, Évora', name='In Shape', horario=None, numero_de_equipamentos=None, localizacao=None, details=SportDetails(iluminado='', tipo_piso=None, mobilidade_reduzida_pratica=None, mobilidade_reduzida_assistencia=None, capacidade='', instalacoes_apoio=[])){}",
+        "stringuified": "In Shape não iluminado com capacidade",
+        "rank score": "-0.060730267",
+        "match score": "0.7579139471054077"
+    },
+    "60d36d162811662bd83a7c10": {
+        "data": "Equipment(area='cultura', type_='O Teatro Garcia de Resende em Évora, Portugal, é um dos mais representativos \"teatros à italiana\" existentes em Portugal e com capacidade para figurar num dos primeiros lugares de uma listagem a nível europeu, ao lado, por exemplo, do Scala de Milão. ', name='Teatro Garcia de Resende', horario=None, numero_de_equipamentos=None, localizacao=None, details=CulturalDetails(acesso_gratuito='', mobilidade_reduzida='', numero_visitantes_medio=None, tutela=Organizacao(nome=''))){}",
+        "stringuified": "Teatro Garcia de Resende pago sem acesso mobilidade reduzida",
+        "rank score": "-0.06434232",
+        "match score": "0.7175226807594299"
+    },
+    "60d36d722811662bd83a7c11": {
+        "data": "Equipment(area='cultura', type_='O Templo Romano de Évora, erroneamente conhecido como Templo de Diana, está localizado na cidade de Évora, em Portugal. Faz parte do centro histórico da cidade, o qual foi classificado como Património Mundial pela UNESCO.', name='Templo Romano Évora', horario=None, numero_de_equipamentos=None, localizacao=None, details=CulturalDetails(acesso_gratuito=True, mobilidade_reduzida=False, numero_visitantes_medio=None, tutela=None)){}",
+        "stringuified": "Templo Romano Évora grátis sem acesso mobilidade reduzida",
+        "rank score": "-0.09361707",
+        "match score": "0.7321578860282898"
+    },
+    "60d36da52811662bd83a7c12": {
+        "data": "Equipment(area='cultura', type_='O Paço Ducal de Vila Viçosa é um importante monumento situado no Terreiro do Paço da vila alentejana do distrito de Évora.', name='Paço Ducal de Vila Viçosa', horario=None, numero_de_equipamentos=None, localizacao=None, details=CulturalDetails(acesso_gratuito=False, mobilidade_reduzida=False, numero_visitantes_medio=None, tutela=Organizacao(nome=''))){'idade': '200 anos'}",
+        "stringuified": "Paço Ducal de Vila Viçosa pago sem acesso mobilidade reduzida idade 200 anos",
+        "rank score": "-0.117731266",
+        "match score": "0.7342044711112976"
+    }
+}
+Q: Estadio da Luz
+A: {
+    "60d373d92811662bd83a7c1c": {
+        "data": "Equipment(area='desporto', type_='O Estádio da Luz ou Estádio do Sport Lisboa e Benfica (nome oficial) é um estádio de futebol de Categoria 4 localizado na freguesia de São Domingos de Benfica, cidade de Lisboa, em Portugal. O estádio é também conhecido pelos benfiquistas como \"A Catedral\".', name='Estádio da Luz', horario=None, numero_de_equipamentos=None, localizacao=None, details=SportDetails(iluminado='', tipo_piso=None, mobilidade_reduzida_pratica=None, mobilidade_reduzida_assistencia=None, capacidade=10000, instalacoes_apoio=[])){}",
+        "stringuified": "Estádio da Luz não iluminado com capacidade 10000",
+        "rank score": "-0.1736038",
+        "match score": "0.7873308062553406"
+    },
+    "60d374182811662bd83a7c1d": {
+        "data": "Equipment(area='desporto', type_='O Estádio do Dragão é um estádio de futebol, localizado na freguesia de Campanhã, cidade do Porto, propriedade do FC Porto, sendo neste recinto que a equipa de futebol joga as suas partidas em casa. O estádio foi inaugurado a 16 de novembro de 2003, e tem uma capacidade para 50 033 espetadores', name='Estádio do dragão', horario=None, numero_de_equipamentos=None, localizacao=None, details=SportDetails(iluminado=None, tipo_piso=None, mobilidade_reduzida_pratica=None, mobilidade_reduzida_assistencia=None, capacidade=100, instalacoes_apoio=None)){}",
+        "stringuified": "Estádio do dragão com capacidade 100",
+        "rank score": "-0.20644572",
+        "match score": "0.7687788009643555"
+    },
+    "60d372a52811662bd83a7c19": {
+        "data": "Equipment(area='social', type_='A IISBA – Incubadora de Inovação Social do Baixo Alentejo é um espaço facilitador da partilha de ideias e de criação de respostas sociais inovadoras e concertadas, é mais do que um espaço físico, pois propaga por todo o território do Baixo Alentejo um espírito inovador, fazendo chegar a todos os espaços as boas práticas, incentivando os agentes locais e as populações a tomarem nas suas mãos, na sua capacidade de empreender, o futuro da região.', name='Incubadora de Inovação Social do Baixo Alentejo', horario=None, numero_de_equipamentos=None, localizacao=None, details=SocialDetails(fins_lucrativos='', capacidade='', numero_de_utentes='', organizacao=Organizacao(nome=''))){}",
+        "stringuified": "Incubadora de Inovação Social do Baixo Alentejo sem fins lucrativos capacidade  utentes",
+        "rank score": "-0.21753189",
+        "match score": "0.6663311719894409"
+    }
+}

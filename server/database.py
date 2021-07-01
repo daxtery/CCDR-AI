@@ -1,7 +1,8 @@
-from typing import Any, Iterator, List, Sequence, Tuple, Dict, TypeVar, cast
+from collections import defaultdict
+from typing import Any, DefaultDict, Iterator, List, Mapping, Sequence, Tuple, Dict, TypeVar, cast, Optional
 from typing_extensions import Protocol
 from typing_extensions import TypedDict
-from ccdr.models.equipment import Equipment, EquipmentArea, Organizacao, SocialEquipment, SportEquipment, HealthEquipment, CulturalEquipment, EducationEquipment, HospitalHealthEquipment, Escola
+from ccdr.models.equipment import Equipment, EquipmentArea, InstalacaoApoio, Localizacao, Horario, Organizacao, SocialDetails, SportDetails, CulturalDetails, EducationDetails, HospitalHealthDetails, GeneralHealthDetails, Escola, Unidade
 from pymongo import database, MongoClient
 from bson.objectid import ObjectId
 
@@ -19,14 +20,6 @@ class DatabaseAccessor(Protocol):
 
     def get_unique_ids(self) -> List[str]:
         ...
-
-
-class BaseEquipmentDataFromDB(TypedDict):
-    name: str
-    area: EquipmentArea
-    type: str
-    extras: Dict[str, str]
-    equipmentDetails: Dict[str, Any]
 
 
 class FeedbackDataFromDB(TypedDict):
@@ -56,7 +49,7 @@ class EquipmentMongoDatabaseAccessor:
         return equipment_collection.distinct('_id')
 
     @staticmethod
-    def get_equipment_data_by_id(_id: str, database: database.Database) -> BaseEquipmentDataFromDB:
+    def get_equipment_data_by_id(_id: str, database: database.Database) -> Dict[str, Any]:
         equipment_collection = database[EquipmentMongoDatabaseAccessor.NAME]
 
         equipment_from_db = equipment_collection.find_one(
@@ -68,7 +61,7 @@ class EquipmentMongoDatabaseAccessor:
         return equipment_from_db
 
     @staticmethod
-    def get_all_equipment_data(database: database.Database) -> Iterator[Tuple[str, BaseEquipmentDataFromDB]]:
+    def get_all_equipment_data(database: database.Database) -> Iterator[Tuple[str, Dict[str, Any]]]:
         equipment_collection = database[EquipmentMongoDatabaseAccessor.NAME]
 
         equipments_from_db = equipment_collection.find({})
@@ -80,106 +73,142 @@ class EquipmentMongoDatabaseAccessor:
 T = TypeVar('T')
 
 
-def value_or_default(data: Dict[str, Any], key: str, default: T) -> T:
-    return data.get(key, default)  # type: ignore
-
-
 class EquipmentMongoDataTransformer:
 
     @staticmethod
-    def transfrom_equipment_data_from_db(data: BaseEquipmentDataFromDB) -> Equipment:
-        area = data["area"]
+    def transfrom_equipment_data_from_db(data: Dict[str, Any]) -> Equipment:
+
+        area: EquipmentArea = data["area"]
         type_ = data["type"]
         name = data["name"]
         extras = data["extras"]
 
-        data_ = cast(Dict[str, Any], data["equipmentDetails"])
+        optional_data: DefaultDict[str, Optional[Any]
+                                   ] = defaultdict(lambda: None, data)
 
-        if area == "Social":
-            return SocialEquipment(
-                name=name,
-                type_=type_,
-                extras=extras,
-                fins_lucrativos=data_["fins lucrativos"],
-                capacidade=value_or_default(data_, "capacidade", 0),
-                numero_de_utentes=value_or_default(
-                    data_, "numero de utentes", 0),
-                organizacao=value_or_default(
-                    data_, "organizacao", Organizacao()),
+        horario = optional_data["horario"]
+        localizacao = optional_data["localizacao"]
+        numero_de_equipamentos = optional_data["numero de equipamentos"]
+
+        details: DefaultDict[str, Optional[Any]] = defaultdict(
+            lambda: None, data["equipmentDetails"])
+
+        if area == "social":
+            organizacao = details["organizacao"]
+
+            if organizacao != None:
+                organizacao = Organizacao(nome=organizacao)
+
+            details_obj = SocialDetails(
+                fins_lucrativos=details["fins_lucrativos"],
+                capacidade=details["capacidade"],
+                numero_de_utentes=details["num_utentes"],
+                organizacao=organizacao,
             )
 
-        if area == "Cultura":
-            return CulturalEquipment(
-                name=name,
-                type_=type_,
-                extras=extras,
-                acesso_gratuito=data_["acesso gratuito"],
-                mobilidade_reduzida=data_["mobilidade reduzida"],
+        elif area == "cultura":
+            tutela = details["tutela"]
+
+            if tutela != None:
+                tutela = Organizacao(nome=tutela)
+
+            details_obj = CulturalDetails(
+                acesso_gratuito=details["acesso_gratuito"],
+                mobilidade_reduzida=details["mobilidade_reduzida"],
+                numero_visitantes_medio=details["num_visitantes_médio"],
+                tutela=tutela,
             )
 
-        if area == "Educação":
-            schools = list(
-                map(
-                    lambda dto: Escola(
-                        dto["grau ensino"],
-                        capacidade=value_or_default(dto, "capacidade", 0),
-                        numero_de_alunos=value_or_default(
-                            dto, "numero de alunos", 0)
-                    ),
-                    data_["escolas"]
-                )
-            )
+        elif area == "educacao":
 
-            return EducationEquipment(name, type_, extras, schools)
+            escolas = details["escolas"]
 
-        if area == "Desporto":
-            return SportEquipment(
-                name=name,
-                type_=type_,
-                extras=extras,
-                iluminado=data_["iluminado"],
-                tipo_piso=data_["tipo piso"],
-                mobilidade_reduzida_pratica=data_[
-                    "mobilidade reduzida prática"],
-                mobilidade_reduzida_assistencia=data_[
-                    "mobilidade reduzida assistência"],
-                capacidade=value_or_default(data_, "capacidade", 0),
-                instalacoes_apoio=value_or_default(
-                    data_, "instalacoes apoio", []),
-            )
+            if escolas is not None:
 
-        if area == "Saúde":
-            if type_ == "Saúde Hospitalar":
-                return HospitalHealthEquipment(
-                    name=name,
-                    extras=extras,
-                    agrupamento_saude=data_["agrupamento saude"],
-                    centro_hospitalar=data_["centro hospitalar"],
-                    valencias=data_["valências"],
-                    especialidades=data_["especialidades"],
-                    numero_de_utentes=value_or_default(
-                        data_, "numero de utentes", 0),
-                    numero_de_equipamentos_por_especialidade=value_or_default(
-                        data_, "numero de equipamentos por especialidade", {}),
-                    unidades=value_or_default(data_, "unidades", [])
+                escolas = list(
+                    map(
+                        lambda dto: Escola(
+                            dto["grau_ensino"],
+                            capacidade=dto["capacidade"],
+                            numero_de_alunos=dto["num_alunos"]
+                        ),
+                        escolas
+                    )
                 )
 
-            else:
-                return HealthEquipment(
-                    name=name,
-                    type_=type_,
-                    extras=extras,
-                    numero_de_utentes=value_or_default(
-                        data_, "numero de utentes", 0),
+            details_obj = EducationDetails(escolas)
+
+        elif area == "desporto":
+            instalacoes_apoio = details["instalacao_apoio"]
+
+            if instalacoes_apoio is not None:
+                instalacoes_apoio = list(
+                    map(lambda u: InstalacaoApoio(nome=u), instalacoes_apoio)
                 )
+
+            details_obj = SportDetails(
+                iluminado=details["iluminado"],
+                tipo_piso=details["tipo_piso"],
+                mobilidade_reduzida_pratica=details[
+                    "mobilidade_reduzida_pratica"],
+                mobilidade_reduzida_assistencia=details[
+                    "mobilidade_reduzida_assistencia"],
+                capacidade=details["capacidade"],
+                instalacoes_apoio=instalacoes_apoio,
+            )
+
+        elif area == "saude":
+            numero_utentes = details["num_utentes"]
+
+            type_ = details["tipo_saude"] or type_
+            details = defaultdict(lambda: None, details["healh_details"])
+
+            if type_ == "saude_hospitalar":
+                unidades = details["tipo_unidades"]
+
+                if unidades is not None:
+                    unidades = list(map(lambda u: Unidade(nome=u), unidades))
+
+                num_equipamentos_por_especialidade = details["num_equipamentos_por_especialidade"]
+
+                if num_equipamentos_por_especialidade is not None:
+                    num_equipamentos_por_especialidade = dict(
+                        num_equipamentos_por_especialidade
+                    )
+
+                details_obj = HospitalHealthDetails(
+                    agrupamento_saude=details["agrupamento saude"],
+                    centro_hospitalar=details["centro hospitalar"],
+                    valencias=details["valencias"],
+                    especialidades=details["especialidades"],
+                    numero_de_utentes=numero_utentes,
+                    numero_de_equipamentos_por_especialidade=num_equipamentos_por_especialidade,
+                    unidades=unidades,
+                )
+
+            elif type_ == "saude_geral":
+                details_obj = GeneralHealthDetails(
+                    numero_de_utentes=numero_utentes,
+                    capacidade=details["capacidade"],
+                    numero_centros_saude=details["num_centros_saude"],
+                )
+
+            else:  # We don't know what this is
+                details_obj = None
 
         else:  # We don't know what this is
-            return Equipment(
-                area=area,
-                type_=type_,
-                name=name,
-                extras=extras
-            )
+            details_obj = None
+
+        return Equipment(
+            area=area,
+            type_=type_,
+            name=name,
+            extras=extras,
+            horario=horario,
+            numero_de_equipamentos=numero_de_equipamentos,
+            localizacao=localizacao,
+            details=details_obj,
+        )
 
 
 class FeedbackMongoDatabaseAccessor:

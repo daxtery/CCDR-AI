@@ -1,4 +1,4 @@
-from server.database import DatabaseAccessor, MongoDatabaseConfig, InMemoryDatabaseAccessor, MongoDatabaseAccessor
+from server.database import DatabaseAccessor, MongoDatabaseConfig, MongoDatabaseAccessor
 from ccdr.ranking_model.ranking import RankingExtension, RankingModel, EquipmentRankingModel
 from server.CCDRDriver import CCDRDriver
 from interference.clusters.ecm import ECM
@@ -8,10 +8,8 @@ from typing import List
 from interference.interface import Interface
 from interference.scoring import ScoringCalculator
 
-from ccdr.models.equipment import stringify
-
 from ccdr.transformers.user_query_transformer import TypeTransformer
-from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer
+from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer, stringify
 
 import json
 
