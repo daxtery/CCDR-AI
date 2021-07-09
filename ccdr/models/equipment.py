@@ -1,10 +1,11 @@
 import abc
-import json
-from typing import Any, Generic, List, Dict, TypeVar, Optional
+from typing import Generic, List, Dict, TypeVar, Optional, Union
 from typing_extensions import Literal, Final, TypedDict
 from dataclasses import dataclass, asdict, field
 
 EquipmentArea = Literal["social", "cultura", "educacao", "desporto", "saude"]
+
+Group = Literal["equipment", "infra"]
 
 
 @dataclass
@@ -22,8 +23,9 @@ T = TypeVar('T')
 
 @dataclass
 class Equipment(Generic[T]):
-    area: EquipmentArea
-    type_: str
+    group: str
+    area: str
+    description: str
     name: str
     extras: Dict[str, str] = field(repr=False)
 
@@ -31,6 +33,7 @@ class Equipment(Generic[T]):
     numero_de_equipamentos: Optional[int]
     localizacao: Optional[Localizacao]
     details: Optional[T]
+    
 
 
 @dataclass
