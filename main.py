@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
     original_stdout = sys.stdout
 
-    with open('out.txt', 'w') as f:
+    with open('main_out.txt', 'w') as f:
         sys.stdout = f  # Change the standard output to the file we created.
 
         query(driver, "Templo Romano")
