@@ -29,26 +29,25 @@ def stringify(equipment: Equipment):
             elif equipment.area == "desporto":
                 return stringuify_sport(equipment)
             elif equipment.area == "saude":
-                if equipment.type_ == "saude Geral":
+                if isinstance(equipment, GeneralHealthDetails):
                     return stringuify_general_health(equipment)
-                elif equipment.type_ == "saude Hospitalar":
+                elif isinstance(equipment, HospitalHealthDetails):
                     return stringuify_hospital_health(equipment)
 
-        return f"{equipment.name} {equipment.area} {equipment.type_}"
+        return f"{equipment.area}"
 
     # TODO: Horário?
     # TODO: numero_de_equipamentos?
 
     def loc_string(localizacao: Localizacao):
-        # TODO: str Localizacao
-        return ""
+        return f"{localizacao.latitude}:{localizacao.longitude}"
 
     loc = stringify_value_func_guard_none(
         equipment.localizacao,
         loc_string
     )
 
-    return f"{_base()}{loc}{dict_to_string(equipment.extras)}".strip()
+    return f"{equipment.name}, {loc}. {equipment.description}. {_base()}. {dict_to_string(equipment.extras)}".strip()
 
 
 def stringuify_social(equipment: Equipment[SocialDetails]):
@@ -63,8 +62,7 @@ def stringuify_social(equipment: Equipment[SocialDetails]):
     )
 
     def organizacao_string(organizacao: Organizacao):
-        # TODO: str organizacao
-        return ""
+        return organizacao.nome
 
     org = stringify_value_func_guard_none(
         equipment.details.organizacao,
@@ -81,7 +79,7 @@ def stringuify_social(equipment: Equipment[SocialDetails]):
         lambda u: f"utentes {u}"
     )
 
-    return f"{equipment.name}{_fins_lucrativos}{capacidade}{utentes}{org}"
+    return f"{_fins_lucrativos}{capacidade}{utentes}{org}"
 
 
 def stringuify_cultural(equipment: Equipment[CulturalDetails]):
@@ -99,7 +97,7 @@ def stringuify_cultural(equipment: Equipment[CulturalDetails]):
         else "pago"
     )
 
-    return f"{equipment.name}{acesso_gratuito}{mobilidade_reduzida}"
+    return f"{acesso_gratuito}{mobilidade_reduzida}"
 
 
 def stringuify_sport(equipment: Equipment[SportDetails]):
@@ -123,9 +121,8 @@ def stringuify_sport(equipment: Equipment[SportDetails]):
         else "sem assitência a mobilidade reduzida"
     )
 
-    # TODO: str apoio
     def instalacao_apoio_string(instalacoes_apoio: List[InstalacaoApoio]):
-        return "\n".join(map(lambda a: "", instalacoes_apoio))
+        return "\n".join(map(lambda a: a.nome, instalacoes_apoio))
 
     apoio = stringify_value_func_guard_none(
         equipment.details.instalacoes_apoio,
@@ -142,7 +139,7 @@ def stringuify_sport(equipment: Equipment[SportDetails]):
         lambda v: f"com capacidade {v}"
     )
 
-    return f"{equipment.name}{iluminado}{mobilidade_reduzida_pratica}{mobilidade_reduzida_assistencia}{capacidade}{apoio}{tipo_piso}"
+    return f"{iluminado}{mobilidade_reduzida_pratica}{mobilidade_reduzida_assistencia}{capacidade}{apoio}{tipo_piso}"
 
 
 def stringuify_education(equipment: Equipment[EducationDetails]):
@@ -180,7 +177,7 @@ def stringuify_general_health(equipment: Equipment[GeneralHealthDetails]):
         lambda v: f"{v} centros de saude"
     )
 
-    return f"{equipment.name}{capacidade}{numero_centros_saude}"
+    return f"{capacidade}{numero_centros_saude}"
 
 
 def stringuify_hospital_health(equipment: Equipment[HospitalHealthDetails]):
@@ -207,15 +204,14 @@ def stringuify_hospital_health(equipment: Equipment[HospitalHealthDetails]):
     )
 
     def unidade_string(unidade: Unidade):
-        # TODO: string unidade
-        return ""
+        return unidade.nome
 
     unidades = stringify_value_func_guard_none(
         equipment.details.unidades,
         lambda unidades: '\n'.join(map(unidade_string, unidades))
     )
 
-    return f"{equipment.name}{agrupamento_saude}{centro_hospitalar}{valencias}{especialidades}{unidades}"
+    return f"{agrupamento_saude}{centro_hospitalar}{valencias}{especialidades}{unidades}"
 
 
 class EquipmentTypeTransformer(TransformerPipeline[Equipment]):

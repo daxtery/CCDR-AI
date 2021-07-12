@@ -8,9 +8,11 @@ EquipmentArea = Literal["social", "cultura", "educacao", "desporto", "saude"]
 Group = Literal["equipment", "infra"]
 
 
-@dataclass
+# NOTE: We freeze it so we can use it as a key in a dictionary (because it is hashable)
+@dataclass(frozen=True)
 class Localizacao:
-    pass
+    latitude: float
+    longitude: float
 
 
 @dataclass
@@ -23,7 +25,6 @@ T = TypeVar('T')
 
 @dataclass
 class Equipment(Generic[T]):
-    group: str
     area: str
     description: str
     name: str
@@ -33,7 +34,7 @@ class Equipment(Generic[T]):
     numero_de_equipamentos: Optional[int]
     localizacao: Optional[Localizacao]
     details: Optional[T]
-    
+
 
 
 @dataclass

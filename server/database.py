@@ -1,3 +1,4 @@
+from ccdr.models.infrastructure import GasDetails, InfrastructureArea, LightDetails, ActivityConsumption, ElectricConsumption
 from collections import defaultdict
 from typing import Any, DefaultDict, Iterator, List, Tuple, Dict, TypeVar, Optional, Generic
 from typing_extensions import Protocol, Type, TypedDict
@@ -41,7 +42,8 @@ class MongoAcessor(abc.ABC):
     def __init__(self, collection: collection.Collection):
         self.collection = collection
 
-    @abc.abstractstaticmethod
+    @staticmethod
+    @abc.abstractmethod
     def name() -> str:
         ...
 
@@ -62,7 +64,7 @@ class MongoCollectionAccessorWrapper(Generic[T]):
         name = self.type_.name()
         return self.type_(collection=db[name])
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, tb):
         pass
 
 
@@ -85,6 +87,10 @@ class EquipmentMongoCollectionAccessor(MongoAcessor):
         for equipment in equipments_from_db:
             yield str(equipment["_id"]), equipment
 
+    @staticmethod
+    def name():
+        return "equipment"
+
 
 class FeedbackMongoCollectionAccessor(MongoAcessor):
 
@@ -102,8 +108,16 @@ class FeedbackMongoCollectionAccessor(MongoAcessor):
         for item in from_db:
             yield str(item["_id"]), item
 
+    @staticmethod
+    def name():
+        return "queryfeedbacks"
 
-def parse_social(details_raw: Dict[str, Any]):
+
+def parse_localizacao(obj: Dict[str, float]):
+    return Localizacao(obj["latitude"], obj["longitude"])
+
+
+def parse_social(details_raw: Dict[str, Optional[Any]]):
     organizacao = details_raw["organizacao"]
 
     if organizacao != None:
@@ -117,7 +131,7 @@ def parse_social(details_raw: Dict[str, Any]):
     )
 
 
-def parse_cultura(details_raw: Dict[str, Any]):
+def parse_cultura(details_raw: Dict[str, Optional[Any]]):
     tutela = details_raw["tutela"]
 
     if tutela != None:
@@ -131,7 +145,7 @@ def parse_cultura(details_raw: Dict[str, Any]):
     )
 
 
-def parse_educacao(details_raw: Dict[str, Any]):
+def parse_educacao(details_raw: Dict[str, Optional[Any]]):
     escolas = details_raw["escolas"]
 
     if escolas is not None:
@@ -150,7 +164,7 @@ def parse_educacao(details_raw: Dict[str, Any]):
     return EducationDetails(escolas)
 
 
-def parse_desporto(details_raw: Dict[str, Any]):
+def parse_desporto(details_raw: Dict[str, Optional[Any]]):
     instalacoes_apoio = details_raw["instalacao_apoio"]
 
     if instalacoes_apoio is not None:
@@ -170,7 +184,7 @@ def parse_desporto(details_raw: Dict[str, Any]):
     )
 
 
-def parse_saude(details_raw: Dict[str, Any]):
+def parse_saude(details_raw: Dict[str, Optional[Any]]):
     numero_utentes = details_raw["num_utentes"]
 
     type_ = details_raw["tipo_saude"]
@@ -244,7 +258,6 @@ def parse_equipment(data: Dict[str, Any]):
         details_obj = None
 
     return Equipment(
-        group="equipment",
         area=area,
         description=description,
         name=name,
@@ -256,13 +269,107 @@ def parse_equipment(data: Dict[str, Any]):
     )
 
 
+def parse_ActivityConsumption(obj: Dict[str, Any]):
+    return ActivityConsumption(obj["activity"], obj["numberOfConsumers"])
+
+
+def parse_ElectricConsumption(obj: Dict[str, Any]):
+    return ElectricConsumption(obj["activity"], obj["consumption"])
+
+
+def parse_energia(details_raw: Dict[str, Optional[Any]]):
+    tipo_energia = details_raw["tipo_energia"]
+    num_operadores = details_raw["num_operadores"]
+    lojas_por_operador = details_raw["num_operadores"]
+    agentes_por_operador = details_raw["num_operadores"]
+
+    finner_details_raw = details_raw["energy_details"]
+    if finner_details_raw is None:
+        return
+
+    if tipo_energia == "luz":
+
+        num_consumo_elec_p_atividade = {
+            parse_localizacao(loc_raw): parse_ActivityConsumption(obj)
+            for loc_raw, obj in finner_details_raw["num_consumo_elec_p_atividade"]
+        } if finner_details_raw["num_consumo_elec_p_atividade"] is not None else None
+
+        consumo_elec_p_atividade = {
+            parse_localizacao(loc_raw): parse_ElectricConsumption(obj)
+            for loc_raw, obj in finner_details_raw["consumo_elec_p_atividade"]
+        } if finner_details_raw["consumo_elec_p_atividade"] is not None else None
+
+        return LightDetails(
+            num_operadores=num_operadores,
+            lojas_por_operador=lojas_por_operador,
+            agentes_por_operador=agentes_por_operador,
+            num_consumo_elec_p_atividade=num_consumo_elec_p_atividade,
+            consumo_elec_p_atividade=consumo_elec_p_atividade,
+        )
+
+    elif tipo_energia == "gas":
+
+        num_consumo_gas = {
+            parse_localizacao(loc_raw): num
+            for loc_raw, num in finner_details_raw["num_consumo_gas"]
+        } if finner_details_raw["num_consumo_gas"] is not None else None
+
+        consumo_gas = {
+            parse_localizacao(loc_raw): num
+            for loc_raw, num in finner_details_raw["consumo_gas"]
+        } if finner_details_raw["consumo_gas"] is not None else None
+
+        pontos_acesso = {
+            parse_localizacao(loc_raw): num
+            for loc_raw, num in finner_details_raw["pontos_acesso"]
+        } if finner_details_raw["pontos_acesso"] is not None else None
+
+        return GasDetails(
+            num_operadores=num_operadores,
+            lojas_por_operador=lojas_por_operador,
+            agentes_por_operador=agentes_por_operador,
+
+            num_consumo_gas=num_consumo_gas,
+            consumo_gas=consumo_gas,
+            pontos_acesso=pontos_acesso,
+        )
+
+
+def parse_comunicacao(details_raw: Dict[str, Optional[Any]]):
+    return
 def parse_infrastructure(data: Dict[str, Any]):
-    pass
+    area: InfrastructureArea = data["area"]
+    description = data["type"]
+    name = data["name"]
+    extras = data["extras"]
+
+    details_raw: DefaultDict[str, Optional[Any]] = defaultdict(
+        lambda: None, data["equipmentDetails"])
+
+    if area == "energia":
+        details_obj = parse_energia(details_raw)
+
+    elif area == "comunicacao":
+        details_obj = parse_comunicacao(details_raw)
+
+    else:  # We don't know what this is
+        details_obj = None
+
+    return Equipment(
+        area=area,
+        description=description,
+        name=name,
+        extras=extras,
+        horario=None,
+        numero_de_equipamentos=None,
+        localizacao=None,
+        details=details_obj,
+    )
 
 
 def parse_equipment_or_infrastructure(data: Dict[str, Any]) -> Optional[Equipment]:
 
-    group: Group = data["group"]
+    group: Group =  data["group"] if "group" in data else "equipment"
 
     if group == "equipment":
         return parse_equipment(data)
