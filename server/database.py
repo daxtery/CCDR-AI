@@ -1,4 +1,4 @@
-from ccdr.models.infrastructure import GasDetails, InfrastructureArea, LightDetails, ActivityConsumption, ElectricConsumption
+from ccdr.models.infrastructure import GasDetails, InfrastructureArea, InternetDetails, LightDetails, ActivityConsumption, ElectricConsumption, MailDetails, TVDetails, TelephoneDetails
 from collections import defaultdict
 from typing import Any, DefaultDict, Iterator, List, Tuple, Dict, TypeVar, Optional, Generic
 from typing_extensions import Protocol, Type, TypedDict
@@ -336,7 +336,74 @@ def parse_energia(details_raw: Dict[str, Optional[Any]]):
 
 
 def parse_comunicacao(details_raw: Dict[str, Optional[Any]]):
-    return
+    num_operadores = details_raw["num_operadores"]
+    tipo_comunicacao = details_raw["tipo_comunicacao"]
+    lojas_por_operador = details_raw["lojas_por_operador"]
+    cobertura_por_operador = details_raw["cobertura_por_operador"]
+
+    communication_details = details_raw["communication_details"]
+    if communication_details is None:
+        return
+
+    if tipo_comunicacao == "telefone":
+        num_postos = communication_details["num_postos"]
+        num_acessos = communication_details["num_acessos"]
+        num_acessos_p_100 = communication_details["num_acessos_p_100"]
+        num_postos_publicos = communication_details["num_postos_publicos"]
+        num_clientes = communication_details["num_clientes"]
+
+        return TelephoneDetails(
+            num_operadores=num_operadores,
+            lojas_por_operador=lojas_por_operador,
+            cobertura_por_operador=cobertura_por_operador,
+
+            num_postos=num_postos,
+            num_acessos=num_acessos,
+            num_acessos_p_100=num_acessos_p_100,
+            num_postos_publicos=num_postos_publicos,
+            num_clientes=num_clientes
+        )
+
+    elif tipo_comunicacao == "internet":
+
+        num_clientes_banda_larga = communication_details["num_clientes_banda_larga"]
+        num_acessos_banda_larga_100 = communication_details["num_acessos_banda_larga_100"]
+        num_acessos_banda_larga = communication_details["num_acessos_banda_larga"]
+
+        return InternetDetails(
+            num_operadores=num_operadores,
+            lojas_por_operador=lojas_por_operador,
+            cobertura_por_operador=cobertura_por_operador,
+
+            num_clientes_banda_larga=num_clientes_banda_larga,
+            num_acessos_banda_larga_100=num_acessos_banda_larga_100,
+            num_acessos_banda_larga=num_acessos_banda_larga,
+        )
+
+    elif tipo_comunicacao == "correio":
+
+        return MailDetails(
+            num_operadores=num_operadores,
+            lojas_por_operador=lojas_por_operador,
+            cobertura_por_operador=cobertura_por_operador,
+
+            _=communication_details,
+        )
+
+    elif tipo_comunicacao == "televisao":
+        num_subscricoes = communication_details['num_subscricoes']
+        num_clientes = communication_details['num_clientes']
+
+        return TVDetails(
+            num_operadores=num_operadores,
+            lojas_por_operador=lojas_por_operador,
+            cobertura_por_operador=cobertura_por_operador,
+
+            num_subscricoes=num_subscricoes,
+            num_clientes=num_clientes,
+        )
+
+
 def parse_infrastructure(data: Dict[str, Any]):
     area: InfrastructureArea = data["area"]
     description = data["type"]
@@ -369,7 +436,7 @@ def parse_infrastructure(data: Dict[str, Any]):
 
 def parse_equipment_or_infrastructure(data: Dict[str, Any]) -> Optional[Equipment]:
 
-    group: Group =  data["group"] if "group" in data else "equipment"
+    group: Group = data["group"] if "group" in data else "equipment"
 
     if group == "equipment":
         return parse_equipment(data)

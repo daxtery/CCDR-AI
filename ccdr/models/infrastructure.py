@@ -38,3 +38,55 @@ class LightDetails(EnergyDetails):
     num_consumo_elec_p_atividade: Optional[Dict[Localizacao,
                                                 ActivityConsumption]]
     consumo_elec_p_atividade: Optional[Dict[Localizacao, ElectricConsumption]]
+
+
+@dataclass
+class CommunicationDetails(abc.ABC):
+    num_operadores: Optional[int]
+    lojas_por_operador: Optional[Dict[str, int]]
+    cobertura_por_operador: Optional[Dict[Localizacao, Dict[str, int]]]
+
+
+@dataclass
+class Access:
+    type: str
+    numAccess: int
+
+
+@dataclass
+class ClientNumber:
+    type: str
+    num: int
+
+
+@dataclass
+class TelephoneDetails(CommunicationDetails):
+    num_postos: Optional[Dict[Localizacao, int]]
+    num_acessos: Optional[Dict[Localizacao, Access]]
+    num_acessos_p_100: Optional[Dict[str, int]]
+    num_postos_publicos: Optional[Dict[Localizacao, int]]
+    num_clientes: Optional[Dict[Localizacao, ClientNumber]]
+
+
+@dataclass
+class InternetDetails(CommunicationDetails):
+    num_clientes_banda_larga: Optional[Dict[str, int]]
+    num_acessos_banda_larga_100: Optional[Dict[str, int]]
+    num_acessos_banda_larga: Optional[Dict[Localizacao, Access]]
+
+
+@dataclass
+class Company:
+    numStations: Optional[Dict[str, int]]
+    numPosts: Optional[Dict[str, int]]
+
+
+@dataclass
+class MailDetails(CommunicationDetails):
+    _: Optional[Dict[Localizacao, Company]]
+
+
+@dataclass
+class TVDetails(CommunicationDetails):
+    num_subscricoes: Optional[Dict[Localizacao, Company]]
+    num_clientes: Optional[Dict[str, Company]]
