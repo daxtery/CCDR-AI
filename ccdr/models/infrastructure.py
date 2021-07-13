@@ -63,7 +63,7 @@ class ClientNumber:
 class TelephoneDetails(CommunicationDetails):
     num_postos: Optional[Dict[Localizacao, int]]
     num_acessos: Optional[Dict[Localizacao, Access]]
-    num_acessos_p_100: Optional[Dict[str, int]]
+    num_acessos_p_100: Optional[Dict[Localizacao, int]]
     num_postos_publicos: Optional[Dict[Localizacao, int]]
     num_clientes: Optional[Dict[Localizacao, ClientNumber]]
 
