@@ -88,5 +88,5 @@ class MailDetails(CommunicationDetails):
 
 @dataclass
 class TVDetails(CommunicationDetails):
-    num_subscricoes: Optional[Dict[Localizacao, Company]]
-    num_clientes: Optional[Dict[str, Company]]
+    num_subscricoes: Optional[Dict[Localizacao, int]]
+    num_clientes: Optional[Dict[str, int]]
