@@ -14,6 +14,9 @@ class Localizacao:
     latitude: float
     longitude: float
 
+    def __str__(self) -> str:
+        return f"{self.latitude},{self.longitude}"
+
 
 @dataclass
 class Horario:
@@ -37,10 +40,12 @@ class Equipment(Generic[T]):
     details: Optional[T]
 
 
-
 @dataclass
 class Organizacao:
     nome: str
+
+    def __str__(self) -> str:
+        return f"{self.nome}"
 
 
 @dataclass
@@ -69,6 +74,9 @@ class Escola:
     capacidade: int
     numero_de_alunos: int
 
+    def __str__(self) -> str:
+        return f"{self.grau_ensino} - {self.numero_de_alunos} / {self.capacidade}"
+
 
 @dataclass
 class EducationDetails:
@@ -78,6 +86,9 @@ class EducationDetails:
 @dataclass
 class InstalacaoApoio:
     nome: str
+
+    def __str__(self) -> str:
+        return f"{self.nome}"
 
 
 @dataclass
@@ -98,6 +109,9 @@ class HealthDetails(abc.ABC):
 @dataclass
 class Unidade:
     nome: str
+
+    def __str__(self) -> str:
+        return f"{self.nome}"
 
 
 @dataclass

@@ -4,6 +4,8 @@ from typing_extensions import Literal, Final, TypedDict
 from dataclasses import dataclass, asdict, field
 from ccdr.models.equipment import Localizacao
 
+from ccdr.utils.string import stringify_value_func_guard_none, dict_to_string
+
 InfrastructureArea = Literal["energia", "comunicacao"]
 
 
@@ -26,11 +28,17 @@ class ActivityConsumption:
     activity: str
     numberOfConsumers: int
 
+    def __str__(self) -> str:
+        return f"{self.activity} - {self.numberOfConsumers}"
+
 
 @dataclass
 class ElectricConsumption:
     activity: str
     consumption: float
+
+    def __str__(self) -> str:
+        return f"{self.activity} - {self.consumption}"
 
 
 @dataclass
@@ -52,11 +60,17 @@ class Access:
     type: str
     numAccess: int
 
+    def __str__(self) -> str:
+        return f"{self.type} - {self.numAccess}"
+
 
 @dataclass
 class ClientNumber:
     type: str
     num: int
+
+    def __str__(self) -> str:
+        return f"{self.type} - {self.num}"
 
 
 @dataclass
@@ -79,6 +93,15 @@ class InternetDetails(CommunicationDetails):
 class Company:
     numStations: Optional[Dict[str, int]]
     numPosts: Optional[Dict[str, int]]
+
+    def __str__(self) -> str:
+        numStations = stringify_value_func_guard_none(
+            self.numStations, lambda s: dict_to_string(s))
+
+        numPosts = stringify_value_func_guard_none(
+            self.numPosts, lambda s: " - " + dict_to_string(s))
+
+        return f"{numStations}{numPosts}"
 
 
 @dataclass
