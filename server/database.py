@@ -1,4 +1,4 @@
-from ccdr.models.infrastructure import GasDetails, InfrastructureArea, InternetDetails, LightDetails, ActivityConsumption, ElectricConsumption, MailDetails, TVDetails, TelephoneDetails
+from ccdr.models.infrastructure import Access, ClientNumber, Company, GasDetails, InfrastructureArea, InternetDetails, LightDetails, ActivityConsumption, ElectricConsumption, MailDetails, TVDetails, TelephoneDetails
 from collections import defaultdict
 from typing import Any, DefaultDict, Iterator, List, Tuple, Dict, TypeVar, Optional, Generic
 from typing_extensions import Protocol, Type, TypedDict
@@ -277,6 +277,28 @@ def parse_ElectricConsumption(obj: Dict[str, Any]):
     return ElectricConsumption(obj["activity"], obj["consumption"])
 
 
+def parse_Access(obj: Dict[str, Any]):
+    return Access(obj["type"], obj["numAccess"])
+
+
+def parse_ClientNumber(obj: Dict[str, Any]):
+    return ClientNumber(obj["type"], obj["num"])
+
+
+def parse_Company(obj: Dict[str, Any]):
+    numStations = {
+        s: v
+        for s, v in obj["numStations"]
+    } if obj["numStations"] is not None else None
+
+    numPosts = {
+        s: v
+        for s, v in obj["numPosts"]
+    } if obj["numPosts"] is not None else None
+
+    return Company(numStations=numStations, numPosts=numPosts)
+
+
 def parse_energia(details_raw: Dict[str, Optional[Any]]):
     tipo_energia = details_raw["tipo_energia"]
     num_operadores = details_raw["num_operadores"]
@@ -336,21 +358,52 @@ def parse_energia(details_raw: Dict[str, Optional[Any]]):
 
 
 def parse_comunicacao(details_raw: Dict[str, Optional[Any]]):
+
     num_operadores = details_raw["num_operadores"]
     tipo_comunicacao = details_raw["tipo_comunicacao"]
-    lojas_por_operador = details_raw["lojas_por_operador"]
-    cobertura_por_operador = details_raw["cobertura_por_operador"]
+
+    lojas_por_operador = {
+        s: obj
+        for s, obj in details_raw["lojas_por_operador"]
+    } if details_raw["lojas_por_operador"] is not None else None
+
+    cobertura_por_operador = defaultdict(dict)
+
+    if details_raw["cobertura_por_operador"] is not None:
+        for loc_raw, obj in details_raw["cobertura_por_operador"]:
+            for name, value in obj["region"]:
+                cobertura_por_operador[parse_localizacao(loc_raw)][name] = value
 
     communication_details = details_raw["communication_details"]
     if communication_details is None:
         return
 
     if tipo_comunicacao == "telefone":
-        num_postos = communication_details["num_postos"]
-        num_acessos = communication_details["num_acessos"]
-        num_acessos_p_100 = communication_details["num_acessos_p_100"]
-        num_postos_publicos = communication_details["num_postos_publicos"]
-        num_clientes = communication_details["num_clientes"]
+
+        num_postos = {
+            parse_localizacao(loc_raw): obj
+            for loc_raw, obj in communication_details["num_postos"]
+        } if communication_details["num_postos"] is not None else None
+
+        num_acessos = {
+            parse_localizacao(loc_raw): parse_Access(obj)
+            for loc_raw, obj in communication_details["num_acessos"]
+        } if communication_details["num_acessos"] is not None else None
+
+        num_acessos_p_100 = {
+            parse_localizacao(loc_raw): obj
+            for loc_raw, obj in communication_details["num_acessos_p_100"]
+        } if communication_details["num_acessos_p_100"] is not None else None
+
+        num_postos_publicos = {
+            parse_localizacao(loc_raw): obj
+            for loc_raw, obj in communication_details["num_postos_publicos"]
+        } if communication_details["num_postos_publicos"] is not None else None
+
+        num_clientes = {
+            parse_localizacao(loc_raw): parse_ClientNumber(obj)
+            for loc_raw, obj in communication_details["num_clientes"]
+        } if communication_details["num_clientes"] is not None else None
 
         return TelephoneDetails(
             num_operadores=num_operadores,
@@ -365,10 +418,20 @@ def parse_comunicacao(details_raw: Dict[str, Optional[Any]]):
         )
 
     elif tipo_comunicacao == "internet":
+        num_clientes_banda_larga = {
+            s: obj
+            for s, obj in communication_details["num_clientes_banda_larga"]
+        } if communication_details["num_clientes_banda_larga"] is not None else None
 
-        num_clientes_banda_larga = communication_details["num_clientes_banda_larga"]
-        num_acessos_banda_larga_100 = communication_details["num_acessos_banda_larga_100"]
-        num_acessos_banda_larga = communication_details["num_acessos_banda_larga"]
+        num_acessos_banda_larga_100 = {
+            s: obj
+            for s, obj in communication_details["num_acessos_banda_larga_100"]
+        } if communication_details["num_acessos_banda_larga_100"] is not None else None
+
+        num_acessos_banda_larga = {
+            parse_localizacao(loc_raw): parse_Access(obj)
+            for loc_raw, obj in communication_details["num_acessos_banda_larga"]
+        } if communication_details["num_acessos_banda_larga"] is not None else None
 
         return InternetDetails(
             num_operadores=num_operadores,
@@ -382,17 +445,29 @@ def parse_comunicacao(details_raw: Dict[str, Optional[Any]]):
 
     elif tipo_comunicacao == "correio":
 
+        _ = {
+            parse_localizacao(loc_raw): parse_Company(obj)
+            for loc_raw, obj in communication_details
+        }
+
         return MailDetails(
             num_operadores=num_operadores,
             lojas_por_operador=lojas_por_operador,
             cobertura_por_operador=cobertura_por_operador,
 
-            _=communication_details,
+            _=_,
         )
 
     elif tipo_comunicacao == "televisao":
-        num_subscricoes = communication_details['num_subscricoes']
-        num_clientes = communication_details['num_clientes']
+        num_subscricoes = {
+            parse_localizacao(loc_raw): obj
+            for loc_raw, obj in communication_details["num_subscricoes"]
+        } if communication_details["num_subscricoes"] is not None else None
+
+        num_clientes = {
+            s: obj
+            for s, obj in communication_details["num_clientes"]
+        } if communication_details["num_clientes"] is not None else None
 
         return TVDetails(
             num_operadores=num_operadores,
