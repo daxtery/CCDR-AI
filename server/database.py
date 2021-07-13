@@ -258,6 +258,7 @@ def parse_equipment(data: Dict[str, Any]):
         details_obj = None
 
     return Equipment(
+        group="equipment",
         area=area,
         description=description,
         name=name,
@@ -498,6 +499,7 @@ def parse_infrastructure(data: Dict[str, Any]):
         details_obj = None
 
     return Equipment(
+        group="infra",
         area=area,
         description=description,
         name=name,

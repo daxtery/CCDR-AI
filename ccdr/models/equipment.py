@@ -25,6 +25,7 @@ T = TypeVar('T')
 
 @dataclass
 class Equipment(Generic[T]):
+    group: str
     area: str
     description: str
     name: str
