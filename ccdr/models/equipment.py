@@ -1,15 +1,21 @@
 import abc
-import json
-from typing import Any, Generic, List, Dict, TypeVar, Optional
+from typing import Generic, List, Dict, TypeVar, Optional, Union
 from typing_extensions import Literal, Final, TypedDict
 from dataclasses import dataclass, asdict, field
 
 EquipmentArea = Literal["social", "cultura", "educacao", "desporto", "saude"]
 
+Group = Literal["equipment", "infra"]
 
-@dataclass
+
+# NOTE: We freeze it so we can use it as a key in a dictionary (because it is hashable)
+@dataclass(frozen=True)
 class Localizacao:
-    pass
+    latitude: float
+    longitude: float
+
+    def __str__(self) -> str:
+        return f"{self.latitude},{self.longitude}"
 
 
 @dataclass
@@ -22,8 +28,9 @@ T = TypeVar('T')
 
 @dataclass
 class Equipment(Generic[T]):
-    area: EquipmentArea
-    type_: str
+    group: str
+    area: str
+    description: str
     name: str
     extras: Dict[str, str] = field(repr=False)
 
@@ -36,6 +43,9 @@ class Equipment(Generic[T]):
 @dataclass
 class Organizacao:
     nome: str
+
+    def __str__(self) -> str:
+        return f"{self.nome}"
 
 
 @dataclass
@@ -64,6 +74,9 @@ class Escola:
     capacidade: int
     numero_de_alunos: int
 
+    def __str__(self) -> str:
+        return f"{self.grau_ensino} - {self.numero_de_alunos} / {self.capacidade}"
+
 
 @dataclass
 class EducationDetails:
@@ -73,6 +86,9 @@ class EducationDetails:
 @dataclass
 class InstalacaoApoio:
     nome: str
+
+    def __str__(self) -> str:
+        return f"{self.nome}"
 
 
 @dataclass
@@ -93,6 +109,9 @@ class HealthDetails(abc.ABC):
 @dataclass
 class Unidade:
     nome: str
+
+    def __str__(self) -> str:
+        return f"{self.nome}"
 
 
 @dataclass

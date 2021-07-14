@@ -1,25 +1,20 @@
-from typing import Callable, Optional, TypeVar, Dict, List
+from ccdr.models.infrastructure import EnergyDetails, GasDetails, InternetDetails, LightDetails, MailDetails, TVDetails, TelephoneDetails
+from typing import Any, Callable, Optional, TypeVar, Dict, List
 from interference.transformers.transformer_pipeline import TransformerPipeline, Instance
 
 from sentence_transformers import SentenceTransformer
 
 from ccdr.models.equipment import CulturalDetails, Equipment, InstalacaoApoio, Localizacao, Organizacao, SportDetails, SocialDetails, EducationDetails, GeneralHealthDetails, HospitalHealthDetails, Unidade
 
-
-def dict_to_string(extras: Dict[str, str]):
-    return " " + '\n'.join(map(lambda pair: f"{pair[0]} {pair[1]}", extras.items()))
-
-
-T = TypeVar('T')
-
-
-def stringify_value_func_guard_none(value: Optional[T], func: Callable[[T], str]):
-    return "" if value is None else " " + func(value)
+from ccdr.utils.string import stringify_value_func_guard_none, dict_to_string
 
 
 def stringify(equipment: Equipment):
     def _base():
-        if equipment.details:
+        if equipment.details is None:
+            return f"{equipment.area}"
+
+        if equipment.group == "equipment":
             if equipment.area == "social":
                 return stringuify_social(equipment)
             elif equipment.area == "cultura":
@@ -29,26 +24,41 @@ def stringify(equipment: Equipment):
             elif equipment.area == "desporto":
                 return stringuify_sport(equipment)
             elif equipment.area == "saude":
-                if equipment.type_ == "saude Geral":
+                if isinstance(equipment.details, GeneralHealthDetails):
                     return stringuify_general_health(equipment)
-                elif equipment.type_ == "saude Hospitalar":
+                elif isinstance(equipment.details, HospitalHealthDetails):
                     return stringuify_hospital_health(equipment)
 
-        return f"{equipment.name} {equipment.area} {equipment.type_}"
+        elif equipment.group == "infra":
+            if equipment.area == "energia":
+                if isinstance(equipment.details, GasDetails):
+                    return stringify_gas(equipment)
+                elif isinstance(equipment.details, LightDetails):
+                    return stringify_light(equipment)
+            elif equipment.area == "comunicacao":
+                if isinstance(equipment.details, TelephoneDetails):
+                    return stringuify_telephone(equipment)
+                elif isinstance(equipment.details, InternetDetails):
+                    return stringuify_internet(equipment)
+                elif isinstance(equipment.details, MailDetails):
+                    return stringuify_mail(equipment)
+                elif isinstance(equipment.details, TVDetails):
+                    return stringuify_tv(equipment)
+
+        return f"{equipment.area}"
 
     # TODO: Horário?
     # TODO: numero_de_equipamentos?
 
     def loc_string(localizacao: Localizacao):
-        # TODO: str Localizacao
-        return ""
+        return f"{localizacao.latitude}:{localizacao.longitude}"
 
     loc = stringify_value_func_guard_none(
         equipment.localizacao,
         loc_string
     )
 
-    return f"{_base()}{loc}{dict_to_string(equipment.extras)}".strip()
+    return f"{equipment.name}, {loc}. {equipment.description}. {_base()}. {dict_to_string(equipment.extras)}".strip()
 
 
 def stringuify_social(equipment: Equipment[SocialDetails]):
@@ -63,8 +73,7 @@ def stringuify_social(equipment: Equipment[SocialDetails]):
     )
 
     def organizacao_string(organizacao: Organizacao):
-        # TODO: str organizacao
-        return ""
+        return organizacao.nome
 
     org = stringify_value_func_guard_none(
         equipment.details.organizacao,
@@ -81,7 +90,7 @@ def stringuify_social(equipment: Equipment[SocialDetails]):
         lambda u: f"utentes {u}"
     )
 
-    return f"{equipment.name}{_fins_lucrativos}{capacidade}{utentes}{org}"
+    return f"{_fins_lucrativos}{capacidade}{utentes}{org}"
 
 
 def stringuify_cultural(equipment: Equipment[CulturalDetails]):
@@ -99,7 +108,7 @@ def stringuify_cultural(equipment: Equipment[CulturalDetails]):
         else "pago"
     )
 
-    return f"{equipment.name}{acesso_gratuito}{mobilidade_reduzida}"
+    return f"{acesso_gratuito}{mobilidade_reduzida}"
 
 
 def stringuify_sport(equipment: Equipment[SportDetails]):
@@ -123,9 +132,8 @@ def stringuify_sport(equipment: Equipment[SportDetails]):
         else "sem assitência a mobilidade reduzida"
     )
 
-    # TODO: str apoio
     def instalacao_apoio_string(instalacoes_apoio: List[InstalacaoApoio]):
-        return "\n".join(map(lambda a: "", instalacoes_apoio))
+        return "\n".join(map(lambda a: a.nome, instalacoes_apoio))
 
     apoio = stringify_value_func_guard_none(
         equipment.details.instalacoes_apoio,
@@ -142,7 +150,7 @@ def stringuify_sport(equipment: Equipment[SportDetails]):
         lambda v: f"com capacidade {v}"
     )
 
-    return f"{equipment.name}{iluminado}{mobilidade_reduzida_pratica}{mobilidade_reduzida_assistencia}{capacidade}{apoio}{tipo_piso}"
+    return f"{iluminado}{mobilidade_reduzida_pratica}{mobilidade_reduzida_assistencia}{capacidade}{apoio}{tipo_piso}"
 
 
 def stringuify_education(equipment: Equipment[EducationDetails]):
@@ -180,7 +188,7 @@ def stringuify_general_health(equipment: Equipment[GeneralHealthDetails]):
         lambda v: f"{v} centros de saude"
     )
 
-    return f"{equipment.name}{capacidade}{numero_centros_saude}"
+    return f"{capacidade}{numero_centros_saude}"
 
 
 def stringuify_hospital_health(equipment: Equipment[HospitalHealthDetails]):
@@ -207,15 +215,130 @@ def stringuify_hospital_health(equipment: Equipment[HospitalHealthDetails]):
     )
 
     def unidade_string(unidade: Unidade):
-        # TODO: string unidade
-        return ""
+        return unidade.nome
 
     unidades = stringify_value_func_guard_none(
         equipment.details.unidades,
         lambda unidades: '\n'.join(map(unidade_string, unidades))
     )
 
-    return f"{equipment.name}{agrupamento_saude}{centro_hospitalar}{valencias}{especialidades}{unidades}"
+    return f"{agrupamento_saude}{centro_hospitalar}{valencias}{especialidades}{unidades}"
+
+
+def stringify_gas(equipment: Equipment[GasDetails]):
+    assert equipment.details
+
+    num_consumo_gas = stringify_value_func_guard_none(
+        equipment.details.num_consumo_gas,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    consumo_gas = stringify_value_func_guard_none(
+        equipment.details.consumo_gas,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    pontos_acesso = stringify_value_func_guard_none(
+        equipment.details.pontos_acesso,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    return f"{num_consumo_gas}{consumo_gas}{pontos_acesso}"
+
+
+def stringify_light(equipment: Equipment[LightDetails]):
+    assert equipment.details
+
+    num_consumo_elec_p_atividade = stringify_value_func_guard_none(
+        equipment.details.num_consumo_elec_p_atividade,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    consumo_elec_p_atividade = stringify_value_func_guard_none(
+        equipment.details.consumo_elec_p_atividade,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    return f"{num_consumo_elec_p_atividade}{consumo_elec_p_atividade}"
+
+
+def stringuify_telephone(equipment: Equipment[TelephoneDetails]):
+    assert equipment.details
+
+    num_postos = stringify_value_func_guard_none(
+        equipment.details.num_postos,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    num_acessos = stringify_value_func_guard_none(
+        equipment.details.num_acessos,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    num_acessos_p_100 = stringify_value_func_guard_none(
+        equipment.details.num_acessos_p_100,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    num_postos_publicos = stringify_value_func_guard_none(
+        equipment.details.num_postos_publicos,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    num_clientes = stringify_value_func_guard_none(
+        equipment.details.num_clientes,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    return f"{num_postos}{num_acessos}{num_acessos_p_100}{num_postos_publicos}{num_clientes}"
+
+
+def stringuify_internet(equipment: Equipment[InternetDetails]):
+    assert equipment.details
+
+    num_clientes_banda_larga = stringify_value_func_guard_none(
+        equipment.details.num_clientes_banda_larga,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    num_acessos_banda_larga_100 = stringify_value_func_guard_none(
+        equipment.details.num_acessos_banda_larga_100,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    num_acessos_banda_larga = stringify_value_func_guard_none(
+        equipment.details.num_acessos_banda_larga,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    return f"{num_clientes_banda_larga}{num_acessos_banda_larga_100}{num_acessos_banda_larga}"
+
+
+def stringuify_mail(equipment: Equipment[MailDetails]):
+    assert equipment.details
+
+    _ = stringify_value_func_guard_none(
+        equipment.details._,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    return _
+
+
+def stringuify_tv(equipment: Equipment[TVDetails]):
+    assert equipment.details
+
+    num_subscricoes = stringify_value_func_guard_none(
+        equipment.details.num_subscricoes,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    num_clientes = stringify_value_func_guard_none(
+        equipment.details.num_clientes,
+        lambda s: dict_to_string(s) + "."
+    )
+
+    return f"{num_subscricoes}{num_clientes}"
 
 
 class EquipmentTypeTransformer(TransformerPipeline[Equipment]):
