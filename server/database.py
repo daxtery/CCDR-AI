@@ -225,7 +225,7 @@ def parse_saude(details_raw: Dict[str, Optional[Any]]):
 
 def parse_equipment(data: Dict[str, Any]):
     area: EquipmentArea = data["area"]
-    description = data["type"]
+    description = data["description"]
     name = data["name"]
     extras = data["extras"]
 
@@ -482,7 +482,7 @@ def parse_comunicacao(details_raw: Dict[str, Optional[Any]]):
 
 def parse_infrastructure(data: Dict[str, Any]):
     area: InfrastructureArea = data["area"]
-    description = data["type"]
+    description = data["description"]
     name = data["name"]
     extras = data["extras"]
 
