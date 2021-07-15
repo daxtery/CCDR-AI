@@ -140,7 +140,7 @@ def parse_cultura(details_raw: Dict[str, Optional[Any]]):
     return CulturalDetails(
         acesso_gratuito=details_raw["acesso_gratuito"],
         mobilidade_reduzida=details_raw["mobilidade_reduzida"],
-        numero_visitantes_medio=details_raw["num_visitantes_médio"],
+        numero_visitantes_medio=details_raw["num_visitantes_medio"],
         tutela=tutela,
     )
 
