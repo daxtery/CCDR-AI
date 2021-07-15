@@ -1,130 +1,103 @@
 import abc
-from typing import Generic, List, Dict, TypeVar, Optional, Union
+from typing import Any, Generic, List, Dict, TypeVar, Optional, Union
 from typing_extensions import Literal, Final, TypedDict
-from dataclasses import dataclass, asdict, field
-
-EquipmentArea = Literal["social", "cultura", "educacao", "desporto", "saude"]
-
-Group = Literal["equipment", "infra"]
 
 
-# NOTE: We freeze it so we can use it as a key in a dictionary (because it is hashable)
-@dataclass(frozen=True)
-class Localizacao:
+class Localizacao(TypedDict, total=True):
     latitude: float
     longitude: float
 
-    def __str__(self) -> str:
-        return f"{self.latitude},{self.longitude}"
 
-
-@dataclass
-class Horario:
+class Horario(TypedDict):
     pass
 
 
-T = TypeVar('T')
-
-
-@dataclass
-class Equipment(Generic[T]):
+class RequiredEquipmentFields(TypedDict):
     group: str
     area: str
     description: str
     name: str
-    extras: Dict[str, str] = field(repr=False)
-
-    horario: Optional[Horario]
-    numero_de_equipamentos: Optional[int]
-    localizacao: Optional[Localizacao]
-    details: Optional[T]
+    extras: Dict[str, str]
 
 
-@dataclass
-class Organizacao:
-    nome: str
-
-    def __str__(self) -> str:
-        return f"{self.nome}"
-
-
-@dataclass
-class SocialDetails:
-    fins_lucrativos: Optional[bool]
-    capacidade: Optional[int]
-    numero_de_utentes: Optional[int]
-    organizacao: Optional[Organizacao]
+class OptionalEquipmentFields(TypedDict, total=False):
+    horario: Horario
+    numero_de_equipamentos: int
+    localizacao: Localizacao
+    equipmentDetails: Any
 
 
-@dataclass
-class CulturalDetails:
-    acesso_gratuito: Optional[bool]
-    mobilidade_reduzida: Optional[bool]
-    numero_visitantes_medio: Optional[int]
-    tutela: Optional[Organizacao]
+class Equipment(RequiredEquipmentFields, OptionalEquipmentFields):
+    pass
 
 
-@dataclass
-class Escola:
+Organizacao = str
+
+
+class SocialDetails(TypedDict, total=False):
+    fins_lucrativos: bool
+    capacidade: int
+    numero_de_utentes: int
+    organizacao: Organizacao
+
+
+class CulturalDetails(TypedDict, total=False):
+    acesso_gratuito: bool
+    mobilidade_reduzida: bool
+    numero_visitantes_medio: int
+    tutela: Organizacao
+
+
+class Escola(TypedDict):
     # FIXME: maybe name?
     # name: str
 
-    # How much is required?...
     grau_ensino: str
     capacidade: int
     numero_de_alunos: int
 
-    def __str__(self) -> str:
-        return f"{self.grau_ensino} - {self.numero_de_alunos} / {self.capacidade}"
+
+class EducationDetails(TypedDict, total=False):
+    escolas: List[Escola]
 
 
-@dataclass
-class EducationDetails:
-    escolas: Optional[List[Escola]]
+InstalacaoApoio = str
 
 
-@dataclass
-class InstalacaoApoio:
-    nome: str
-
-    def __str__(self) -> str:
-        return f"{self.nome}"
-
-
-@dataclass
-class SportDetails:
-    iluminado: Optional[bool]
-    tipo_piso: Optional[str]
-    mobilidade_reduzida_pratica: Optional[bool]
-    mobilidade_reduzida_assistencia: Optional[bool]
-    capacidade: Optional[int]
-    instalacoes_apoio: Optional[List[InstalacaoApoio]]
+class SportDetails(TypedDict, total=False):
+    iluminado: bool
+    tipo_piso: str
+    mobilidade_reduzida_pratica: bool
+    mobilidade_reduzida_assistencia: bool
+    capacidade: int
+    instalacoes_apoio: List[InstalacaoApoio]
 
 
-@dataclass
-class HealthDetails(abc.ABC):
-    numero_de_utentes: Optional[int]   # NOTE: Do we need this?
+class RequiredHealthDetails(TypedDict):
+    tipo_saude: str
+    healh_details: Any
 
 
-@dataclass
-class Unidade:
-    nome: str
-
-    def __str__(self) -> str:
-        return f"{self.nome}"
+class OptionalHealthDetails(TypedDict, total=False):
+    numero_de_utentes: int   # NOTE: Do we need this?
 
 
-@dataclass
-class HospitalHealthDetails(HealthDetails):
-    numero_de_equipamentos_por_especialidade: Optional[Dict[str, int]]
-    unidades: Optional[List[Unidade]]
-    agrupamento_saude: Optional[str]
-    centro_hospitalar: Optional[str]
-    valencias: Optional[List[str]]
-    especialidades: Optional[List[str]]
+class HealthDetails(RequiredHealthDetails, OptionalHealthDetails):
+    pass
 
 
-@dataclass
-class GeneralHealthDetails(HealthDetails):
-    capacidade: Optional[int]
-    numero_centros_saude: Optional[int]
+Unidade = str
+
+
+class HospitalHealthDetails(TypedDict, total=False):
+    numero_de_equipamentos_por_especialidade: Dict[str, int]
+    unidades: List[Unidade]
+    agrupamento_saude: str
+    centro_hospitalar: str
+    valencias: List[str]
+    especialidades: List[str]
+
+
+class GeneralHealthDetails(TypedDict, total=False):
+    capacidade: int
+    numero_centros_saude: int

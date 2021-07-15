@@ -1,115 +1,92 @@
 import abc
-from typing import Any, Generic, List, Dict, TypeVar, Optional, Union
+from typing import Any, Generic, List, Dict, TypeVar
 from typing_extensions import Literal, Final, TypedDict
-from dataclasses import dataclass, asdict, field
 from ccdr.models.equipment import Localizacao
 
-from ccdr.utils.string import stringify_value_func_guard_none, dict_to_string
 
-InfrastructureArea = Literal["energia", "comunicacao"]
-
-
-@dataclass
-class EnergyDetails(abc.ABC):
-    num_operadores: Optional[int]
-    lojas_por_operador: Optional[Dict[str, int]]
-    agentes_por_operador: Optional[Dict[str, int]]
+class RequiredEnergyDetails(TypedDict):
+    tipo_energia: str
+    energy_details: Any
 
 
-@dataclass
-class GasDetails(EnergyDetails):
-    num_consumo_gas: Optional[Dict[Localizacao, int]]
-    consumo_gas: Optional[Dict[Localizacao, int]]
-    pontos_acesso: Optional[Dict[Localizacao, int]]
+class OptionalEnergyDetails(TypedDict, total=False):
+    num_operadores: int
+    lojas_por_operador: Dict[str, int]
+    agentes_por_operador: Dict[str, int]
 
 
-@dataclass
-class ActivityConsumption:
+class EnergyDetails(RequiredEnergyDetails, OptionalEnergyDetails):
+    pass
+
+
+class GasDetails(TypedDict, total=False):
+    num_consumo_gas: Dict[Localizacao, int]
+    consumo_gas: Dict[Localizacao, int]
+    pontos_acesso: Dict[Localizacao, int]
+
+
+class ActivityConsumption(TypedDict):
     activity: str
     numberOfConsumers: int
 
-    def __str__(self) -> str:
-        return f"{self.activity} - {self.numberOfConsumers}"
 
-
-@dataclass
-class ElectricConsumption:
+class ElectricConsumption(TypedDict):
     activity: str
     consumption: float
 
-    def __str__(self) -> str:
-        return f"{self.activity} - {self.consumption}"
+
+class LightDetails(TypedDict, total=False):
+    num_consumo_elec_p_atividade: Dict[Localizacao, ActivityConsumption]
+    consumo_elec_p_atividade: Dict[Localizacao, ElectricConsumption]
 
 
-@dataclass
-class LightDetails(EnergyDetails):
-    num_consumo_elec_p_atividade: Optional[Dict[Localizacao,
-                                                ActivityConsumption]]
-    consumo_elec_p_atividade: Optional[Dict[Localizacao, ElectricConsumption]]
+class OptionalCommunicationDetails(TypedDict, total=False):
+    num_operadores: int
+    lojas_por_operador: Dict[str, int]
+    cobertura_por_operador: Dict[Localizacao, Dict[str, int]]
 
 
-@dataclass
-class CommunicationDetails(abc.ABC):
-    num_operadores: Optional[int]
-    lojas_por_operador: Optional[Dict[str, int]]
-    cobertura_por_operador: Optional[Dict[Localizacao, Dict[str, int]]]
+class RequiredCommunicationDetails(TypedDict):
+    tipo_comunicacao: str
+    communication_details: Any
 
 
-@dataclass
-class Access:
+class CommunicationDetails(RequiredCommunicationDetails, OptionalCommunicationDetails):
+    pass
+
+
+class Access(TypedDict):
     type: str
     numAccess: int
 
-    def __str__(self) -> str:
-        return f"{self.type} - {self.numAccess}"
 
-
-@dataclass
-class ClientNumber:
+class ClientNumber(TypedDict):
     type: str
     num: int
 
-    def __str__(self) -> str:
-        return f"{self.type} - {self.num}"
+
+class TelephoneDetails(TypedDict, total=False):
+    num_postos: Dict[Localizacao, int]
+    num_acessos: Dict[Localizacao, Access]
+    num_acessos_p_100: Dict[Localizacao, int]
+    num_postos_publicos: Dict[Localizacao, int]
+    num_clientes: Dict[Localizacao, ClientNumber]
 
 
-@dataclass
-class TelephoneDetails(CommunicationDetails):
-    num_postos: Optional[Dict[Localizacao, int]]
-    num_acessos: Optional[Dict[Localizacao, Access]]
-    num_acessos_p_100: Optional[Dict[Localizacao, int]]
-    num_postos_publicos: Optional[Dict[Localizacao, int]]
-    num_clientes: Optional[Dict[Localizacao, ClientNumber]]
+class InternetDetails(TypedDict, total=False):
+    num_clientes_banda_larga: Dict[str, int]
+    num_acessos_banda_larga_100: Dict[str, int]
+    num_acessos_banda_larga: Dict[Localizacao, Access]
 
 
-@dataclass
-class InternetDetails(CommunicationDetails):
-    num_clientes_banda_larga: Optional[Dict[str, int]]
-    num_acessos_banda_larga_100: Optional[Dict[str, int]]
-    num_acessos_banda_larga: Optional[Dict[Localizacao, Access]]
+class Company(TypedDict):
+    numStations: Dict[str, int]
+    numPosts: Dict[str, int]
 
 
-@dataclass
-class Company:
-    numStations: Optional[Dict[str, int]]
-    numPosts: Optional[Dict[str, int]]
-
-    def __str__(self) -> str:
-        numStations = stringify_value_func_guard_none(
-            self.numStations, lambda s: dict_to_string(s))
-
-        numPosts = stringify_value_func_guard_none(
-            self.numPosts, lambda s: " - " + dict_to_string(s))
-
-        return f"{numStations}{numPosts}"
+MailDetails = Dict[Localizacao, Company]
 
 
-@dataclass
-class MailDetails(CommunicationDetails):
-    _: Optional[Dict[Localizacao, Company]]
-
-
-@dataclass
-class TVDetails(CommunicationDetails):
-    num_subscricoes: Optional[Dict[Localizacao, int]]
-    num_clientes: Optional[Dict[str, int]]
+class TVDetails(TypedDict, total=False):
+    num_subscricoes: Dict[Localizacao, int]
+    num_clientes: Dict[str, int]

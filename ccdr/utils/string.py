@@ -7,5 +7,5 @@ def dict_to_string(extras: Dict[Any, Any]):
 T = TypeVar('T')
 
 
-def stringify_value_func_guard_none(value: Optional[T], func: Callable[[T], str]):
+def stringuify_value_func_guard_none(value: Optional[T], func: Callable[[T], str]):
     return "" if value is None else " " + func(value)

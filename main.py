@@ -9,7 +9,7 @@ from interference.interface import Interface
 from interference.scoring import ScoringCalculator
 
 from ccdr.transformers.user_query_transformer import TypeTransformer
-from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer, stringify
+from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer, stringuify
 
 import json
 
@@ -32,8 +32,8 @@ def query(driver: CCDRDriver, v: str):
 
     pretty_results = {
         tag: {
-            "data": str(eq) + str(eq.extras),
-            "stringuified": stringify(eq),
+            "data": str(eq) + str(eq["extras"]),
+            "stringuified": stringuify(eq),
             "rank score": str(results[0][tag]),
             "match score": str(results[1][tag])
         } for tag, eq in eqs.items()
@@ -69,7 +69,7 @@ if __name__ == "__main__":
             ranker_factory=ranker_factory,
             database_accessor = database_accessor,
         ),
-        ranking_stringify_equipment_func=stringify,
+        ranking_stringify_equipment_func=stringuify,
         database_accessor=database_accessor,
     )
 

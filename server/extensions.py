@@ -12,7 +12,7 @@ from interference.interface import Interface
 from interference.scoring import ScoringCalculator
 
 from ccdr.transformers.user_query_transformer import TypeTransformer
-from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer, stringify
+from ccdr.transformers.equipment_transformer import EquipmentTypeTransformer, stringuify
 
 import json
 
@@ -45,7 +45,7 @@ driver = CCDRDriver(
         model_name="neuralmind/bert-base-portuguese-cased",
         ranker_factory=ranker_factory
     ),
-    ranking_stringify_equipment_func=stringify,
+    ranking_stringify_equipment_func=stringuify,
     database_accessor=database_acessor,
 )
 
