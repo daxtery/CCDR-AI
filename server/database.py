@@ -1,8 +1,6 @@
-from ccdr.models.infrastructure import Access, ClientNumber, Company, GasDetails, InfrastructureArea, InternetDetails, LightDetails, ActivityConsumption, ElectricConsumption, MailDetails, TVDetails, TelephoneDetails
-from collections import defaultdict
 from typing import Any, DefaultDict, Iterator, List, Tuple, Dict, TypeVar, Optional, Generic
 from typing_extensions import Protocol, Type, TypedDict
-from ccdr.models.equipment import Equipment, EquipmentArea, Group, InstalacaoApoio, Localizacao, Horario, Organizacao, SocialDetails, SportDetails, CulturalDetails, EducationDetails, HospitalHealthDetails, GeneralHealthDetails, Escola, Unidade
+from ccdr.models.equipment import Equipment
 from pymongo import MongoClient, collection
 from bson.objectid import ObjectId
 import abc

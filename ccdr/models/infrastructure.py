@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Generic, List, Dict, TypeVar
+from typing import Any, Generic, List, Dict, TypeVar, Tuple
 from typing_extensions import Literal, Final, TypedDict
 from ccdr.models.equipment import Localizacao
 
@@ -11,8 +11,8 @@ class RequiredEnergyDetails(TypedDict):
 
 class OptionalEnergyDetails(TypedDict, total=False):
     num_operadores: int
-    lojas_por_operador: Dict[str, int]
-    agentes_por_operador: Dict[str, int]
+    lojas_por_operador: List[Tuple[str, int]]
+    agentes_por_operador: List[Tuple[str, int]]
 
 
 class EnergyDetails(RequiredEnergyDetails, OptionalEnergyDetails):
@@ -20,9 +20,9 @@ class EnergyDetails(RequiredEnergyDetails, OptionalEnergyDetails):
 
 
 class GasDetails(TypedDict, total=False):
-    num_consumo_gas: Dict[Localizacao, int]
-    consumo_gas: Dict[Localizacao, int]
-    pontos_acesso: Dict[Localizacao, int]
+    num_consumo_gas: List[Tuple[Localizacao, int]]
+    consumo_gas: List[Tuple[Localizacao, int]]
+    pontos_acesso: List[Tuple[Localizacao, int]]
 
 
 class ActivityConsumption(TypedDict):
@@ -36,14 +36,14 @@ class ElectricConsumption(TypedDict):
 
 
 class LightDetails(TypedDict, total=False):
-    num_consumo_elec_p_atividade: Dict[Localizacao, ActivityConsumption]
-    consumo_elec_p_atividade: Dict[Localizacao, ElectricConsumption]
+    num_consumo_elec_p_atividade: List[Tuple[Localizacao, ActivityConsumption]]
+    consumo_elec_p_atividade: List[Tuple[Localizacao, ElectricConsumption]]
 
 
 class OptionalCommunicationDetails(TypedDict, total=False):
     num_operadores: int
-    lojas_por_operador: Dict[str, int]
-    cobertura_por_operador: Dict[Localizacao, Dict[str, int]]
+    lojas_por_operador: List[Tuple[str, int]]
+    cobertura_por_operador: List[Tuple[Localizacao, Tuple[str, int]]]
 
 
 class RequiredCommunicationDetails(TypedDict):
@@ -66,27 +66,27 @@ class ClientNumber(TypedDict):
 
 
 class TelephoneDetails(TypedDict, total=False):
-    num_postos: Dict[Localizacao, int]
-    num_acessos: Dict[Localizacao, Access]
-    num_acessos_p_100: Dict[Localizacao, int]
-    num_postos_publicos: Dict[Localizacao, int]
-    num_clientes: Dict[Localizacao, ClientNumber]
+    num_postos: List[Tuple[Localizacao, int]]
+    num_acessos: List[Tuple[Localizacao, Access]]
+    num_acessos_p_100: List[Tuple[Localizacao, int]]
+    num_postos_publicos: List[Tuple[Localizacao, int]]
+    num_clientes: List[Tuple[Localizacao, ClientNumber]]
 
 
 class InternetDetails(TypedDict, total=False):
-    num_clientes_banda_larga: Dict[str, int]
-    num_acessos_banda_larga_100: Dict[str, int]
-    num_acessos_banda_larga: Dict[Localizacao, Access]
+    num_clientes_banda_larga: List[Tuple[str, int]]
+    num_acessos_banda_larga_100: List[Tuple[str, int]]
+    num_acessos_banda_larga: List[Tuple[Localizacao, Access]]
 
 
 class Company(TypedDict):
-    numStations: Dict[str, int]
-    numPosts: Dict[str, int]
+    numStations: List[Tuple[str, int]]
+    numPosts: List[Tuple[str, int]]
 
 
-MailDetails = Dict[Localizacao, Company]
+MailDetails = List[Tuple[Localizacao, Company]]
 
 
 class TVDetails(TypedDict, total=False):
-    num_subscricoes: Dict[Localizacao, int]
-    num_clientes: Dict[str, int]
+    num_subscricoes: List[Tuple[Localizacao, int]]
+    num_clientes: List[Tuple[str, int]]

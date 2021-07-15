@@ -1,15 +1,20 @@
 import abc
-from typing import Any, Generic, List, Dict, TypeVar, Optional, Union
+from typing import Any, Generic, List, Dict, TypeVar, Optional, Union, Tuple
 from typing_extensions import Literal, Final, TypedDict
 
 
 class Localizacao(TypedDict, total=True):
-    latitude: float
-    longitude: float
+    lat: float
+    long: float
 
 
 class Horario(TypedDict):
     pass
+
+
+class Extra(TypedDict):
+    name: str
+    value: str
 
 
 class RequiredEquipmentFields(TypedDict):
@@ -17,7 +22,7 @@ class RequiredEquipmentFields(TypedDict):
     area: str
     description: str
     name: str
-    extras: Dict[str, str]
+    extras: List[Extra]
 
 
 class OptionalEquipmentFields(TypedDict, total=False):
@@ -37,14 +42,14 @@ Organizacao = str
 class SocialDetails(TypedDict, total=False):
     fins_lucrativos: bool
     capacidade: int
-    numero_de_utentes: int
+    num_utentes: int
     organizacao: Organizacao
 
 
 class CulturalDetails(TypedDict, total=False):
     acesso_gratuito: bool
     mobilidade_reduzida: bool
-    numero_visitantes_medio: int
+    num_visitantes_medio: int
     tutela: Organizacao
 
 
@@ -54,7 +59,7 @@ class Escola(TypedDict):
 
     grau_ensino: str
     capacidade: int
-    numero_de_alunos: int
+    num_alunos: int
 
 
 class EducationDetails(TypedDict, total=False):
@@ -70,7 +75,7 @@ class SportDetails(TypedDict, total=False):
     mobilidade_reduzida_pratica: bool
     mobilidade_reduzida_assistencia: bool
     capacidade: int
-    instalacoes_apoio: List[InstalacaoApoio]
+    instalacao_apoio: List[InstalacaoApoio]
 
 
 class RequiredHealthDetails(TypedDict):
@@ -79,7 +84,7 @@ class RequiredHealthDetails(TypedDict):
 
 
 class OptionalHealthDetails(TypedDict, total=False):
-    numero_de_utentes: int   # NOTE: Do we need this?
+    num_utentes: int
 
 
 class HealthDetails(RequiredHealthDetails, OptionalHealthDetails):
@@ -90,8 +95,8 @@ Unidade = str
 
 
 class HospitalHealthDetails(TypedDict, total=False):
-    numero_de_equipamentos_por_especialidade: Dict[str, int]
-    unidades: List[Unidade]
+    num_equipamentos_por_especialidade: List[Tuple[str, int]]
+    tipo_unidades: List[Unidade]
     agrupamento_saude: str
     centro_hospitalar: str
     valencias: List[str]
@@ -100,4 +105,4 @@ class HospitalHealthDetails(TypedDict, total=False):
 
 class GeneralHealthDetails(TypedDict, total=False):
     capacidade: int
-    numero_centros_saude: int
+    num_centros_saude: int
