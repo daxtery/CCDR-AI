@@ -1,0 +1,326 @@
+[
+    {
+        "name": "Museu de Évora",
+        "group": "equipment",
+        "area": "cultura",
+        "description": "O Museu de Évora, remodelado em 2009, tem mais de 100 anos. O interior do próprio edifício é já merecedor de uma visita. A coleção iniciou-se com artigos recolhidos pelo Dr. Augusto Filipe Simões durante a década de 1870, contendo peças romanas, visigóticas e árabes antes parte do Templo Romano, Palácio D. Manuel e Praça do Giraldo. Hoje em dia, o destaque do Museu de Évora vai para um conjunto de 13 painéis que representam a Vida da Virgem e 6 painéis mais pequenos da Paixão de Cristo pintados em meados do século XV por desconhecidos da escola de Bruges. Para além destas peças, poderá ainda ver pinturas de artistas conhecidos como Francisco Henriques, Garcia Fernandes, Mestre do Sardoal, Theniers, Avercamp, Avelar Rebelo,… Relevantes ainda são a estatuaria romana e aras votivas (pedras erigidas em memória de alguém), túmulos da época medieval, o azulejo da Anunciação da Virgem, o Esmalte de Limoges,… Ao todo, mais de 20.000 objetos dos mais variados temas.",
+        "equipmentDetails": {
+            "acesso_gratuito": false,
+            "num_visitantes_medio": 30000,
+            "mobilidade_reduzida": true,
+            "tutela": "Câmara Municipal de Évora"
+        },
+        "extras": []
+    },
+    {
+        "name": "Palácio dos Duques de Cadaval e Igreja dos Lóios",
+        "group": "equipment",
+        "area": "cultura",
+        "description": "O Palácio dos Duques de Cadaval (século XIV) assenta em parte na muralha de Évora, com destaque para a Torre das Cinco Quinas. Para além do extremamente agradável Jardim do Paço, de entrada livre, é possível visitar a sala de exposições da Casa Cadaval, parte do próprio palácio. Neste simpático museu de Évora estão expostas pinturas antigas, móveis, antigos manuscritos, uma coleção de códices iluminados, armaria, esculturas,… A grande cozinha merece destaque.",
+        "equipmentDetails": {
+            "acesso_gratuito": false,
+            "num_visitantes_medio": 4000,
+            "mobilidade_reduzida": true,
+            "tutela": "Câmara Municipal de Évora"
+        },
+        "extras": []
+    },
+    {
+        "name": "Agrupamento de Escolas Severim de Faria",
+        "group": "equipment",
+        "area": "educacao",
+        "description": "A escola também é as memórias que dela temos.",
+        "equipmentDetails": {
+            "escolas": [
+                {
+                    "num_alunos": 900,
+                    "capacidade": 1000,
+                    "grau_ensino": "1º cliclo"
+                },
+                {
+                    "num_alunos": 500,
+                    "capacidade": 800,
+                    "grau_ensino": "2º cliclo"
+                },
+                {
+                    "num_alunos": 1500,
+                    "capacidade": 2000,
+                    "grau_ensino": "3º cliclo"
+                },
+                {
+                    "num_alunos": 3000,
+                    "capacidade": 3200,
+                    "grau_ensino": "secundario"
+                }
+            ]
+        },
+        "extras": []
+    },
+    {
+        "name": "Agrupamento de Escolas Gabriel Pereira",
+        "group": "equipment",
+        "area": "educacao",
+        "description": "O aluno a quem nunca se pediu para fazer o que não é capaz, nunca faz aquilo que realmente consegue fazer.",
+        "equipmentDetails": {
+            "escolas": [
+                {
+                    "num_alunos": 500,
+                    "capacidade": 640,
+                    "grau_ensino": "pre-escola"
+                },
+                {
+                    "num_alunos": 800,
+                    "capacidade": 800,
+                    "grau_ensino": "1º cliclo"
+                },
+                {
+                    "num_alunos": 400,
+                    "capacidade": 500,
+                    "grau_ensino": "2º cliclo"
+                },
+                {
+                    "num_alunos": 1000,
+                    "capacidade": 2000,
+                    "grau_ensino": "3º cliclo"
+                },
+                {
+                    "num_alunos": 1000,
+                    "capacidade": 1500,
+                    "grau_ensino": "secundario"
+                }
+            ]
+        },
+        "extras": []
+    },
+    {
+        "name": "Hospital do Espírito Santo de Évora",
+        "group": "equipment",
+        "area": "saude",
+        "description": "O Hospital do Espírito Santo de Évora E.P.E. é um hospital público geral, integrado na rede do Serviço Nacional de Saúde (S.N.S.) da Região Alentejo, que desenvolve a sua actividade dirigida à prestação de cuidados de saúde diferenciados, adequados e em tempo útil, garantindo padrões elevados de desempenho técnico-científico, de eficaz e eficiente gestão de recursos, de humanização e promovendo o desenvolvimento profissional dos seus colaboradores.",
+        "equipmentDetails": {
+            "tipo_saude": "saude_hospitalar",
+            "num_utentes": 10000,
+            "healh_details": {
+                "num_equipamentos_por_especialidade": [
+                    [
+                        "Cardiologia",
+                        10
+                    ],
+                    [
+                        "Neurologia",
+                        35
+                    ],
+                    [
+                        "Pneumologia",
+                        57
+                    ],
+                    [
+                        "Imunoalergologia",
+                        9
+                    ],
+                    [
+                        "Dermatologia",
+                        18
+                    ]
+                ],
+                "tipo_unidades": [
+                    "UCI",
+                    "UCP"
+                ],
+                "especialidades": [
+                    "Cardiologia",
+                    "Neurologia",
+                    "Dermatologia",
+                    "Imunoalergologia",
+                    "Pneumologia"
+                ],
+                "valencias": [
+                    "ARS-Alentejo"
+                ],
+                "agrupamento_saude": "Agrupamento de Centros de Saúde do Alentejo Central",
+                "centro_hospitalar": "Hospital do Espírito Santo de Évora"
+            }
+        },
+        "extras": []
+    },
+    {
+        "name": "Agrupamento de Centros de Saúde do Alentejo Central",
+        "group": "equipment",
+        "area": "saude",
+        "description": "Desenvolver atividades de promoção da saúde e prevenção da doença, prestação de cuidados na doença e ligação a outros serviços para a continuidade dos cuidados; Desenvolver atividades de vigilância epidemiológica, investigação em saúde, controlo e avaliação dos resultados e participar na formação de diversos grupos profissionais nas suas diferentes fases, pré-graduada, pós-graduada e contínua.",
+        "equipmentDetails": {
+            "tipo_saude": "saude_geral",
+            "num_utentes": 26350,
+            "healh_details": {
+                "capacidade": 30000,
+                "num_centros_saude": 5
+            }
+        },
+        "extras": []
+    },
+    {
+        "name": "Lar Nossa Senhora da Visitação",
+        "group": "equipment",
+        "area": "social",
+        "description": "O Lar Nossa Senhora da Visitação é uma Estrutura Residencial para Idosos, de pequenas dimensões, o que torna propício a um ambiente familiar.",
+        "equipmentDetails": {
+            "num_utentes": 67,
+            "capacidade": 100,
+            "fins_lucrativos": true,
+            "organizacao": "Santa Casa da Misericórdia de Évora"
+        },
+        "extras": []
+    },
+    {
+        "name": "Associação de Amigos da Criança e da Família Chão dos Meninos",
+        "group": "equipment",
+        "area": "social",
+        "description": "A Associação de Amigos da Criança e da Família “Chão dos Meninos” pretende constituir-se como uma referência de excelência na sua área de actuação, ao nível das comunidades local, regional e nacional, reforçando para o efeito as seguintes áreas de intervenção: prevenção de situações de maus tratos; estudo, investigação e divulgação dos conhecimentos especializados; qualificação e sustentabilidade dos serviços prestados.",
+        "equipmentDetails": {
+            "num_utentes": 55,
+            "capacidade": 200,
+            "fins_lucrativos": false,
+            "organizacao": "Associação de Amigos da Criança e da Família Chão dos Meninos"
+        },
+        "extras": []
+    },
+    {
+        "name": "Estádio Sanches de Miranda - Juventude Sport Clube",
+        "group": "equipment",
+        "area": "desporto",
+        "description": "O Juventude Sport Clube ou Juventude de Évora, como é conhecido, é um clube português sediado na cidade alentejana de Évora. O seu lema é 'Força de Vontade'.",
+        "equipmentDetails": {
+            "capacidade": 5000,
+            "iluminado": true,
+            "tipo_piso": "relva",
+            "mobilidade_reduzida_pratica": false,
+            "mobilidade_reduzida_assistencia": false,
+            "instalacao_apoio": [
+                "Bar",
+                "Balneários"
+            ]
+        },
+        "extras": []
+    },
+    {
+        "name": "Pavilhão Gimnodesportivo da Universidade de Évora",
+        "group": "equipment",
+        "area": "desporto",
+        "description": "O Departamento de Desporto e Saúde da Universidade de Évora está integrado na Escola de Ciências e Tecnologia. Antecedida pela Comissão de Instalação dos Ensinos na Área da Saúde e do Bem-estar, desde o ano letivo de 2001/02 que iniciámos a oferta formativa de cursos, mais em concreto como curso de Licenciatura em Educação Física e Desporto que hoje em dia prossegue com a designação de Ciências do Desporto. Ao longo dos anos fomos aumentando a oferta formativa e neste momento oferecemos 2 cursos de Licenciatura e 3 cursos de Mestrado.",
+        "equipmentDetails": {
+            "capacidade": 600,
+            "iluminado": true,
+            "tipo_piso": "modular",
+            "mobilidade_reduzida_pratica": true,
+            "mobilidade_reduzida_assistencia": true,
+            "instalacao_apoio": [
+                "Balneários"
+            ]
+        },
+        "extras": []
+    },
+    {
+        "name": "Pelourinho de Estremoz",
+        "group": "equipment",
+        "area": "cultura",
+        "description": "Construído em inícios do séc. XVI, no reinado de D. Manuel I (r. 1495-1521), em 1698 foi removido da frente do antigo Paço Real de D. Dinis (actual Pousada da Rainha Santa Isabel) para o terreiro de Santo André, defronte aos Paços do Concelho da época. Entre 1867 e 1871 foi arriado deste local e disperso em local desconhecido, tendo sido reconstruído, em 1916, por Saavedra Machado e Luís Chaves e colocado no local onde hoje se encontra. Mantém originais o fuste, o capitel e o coruchéu de remate, todos estes elementos de estilo manuelino.",
+        "equipmentDetails": {
+            "acesso_gratuito": true,
+            "num_visitantes_medio": 10,
+            "mobilidade_reduzida": false,
+            "tutela": "Câmara Municipal de Estremoz"
+        },
+        "extras": [
+            {
+                "name": "altura",
+                "value": "1.17 metros"
+            },
+            {
+                "name": "materiais",
+                "value": "Estrutura em cantaria de mármore branco de Estremoz."
+            }
+        ]
+    },
+    {
+        "name": "Centro Ciência Viva de Estremoz",
+        "group": "equipment",
+        "area": "cultura",
+        "description": "Um Centro Ciência Viva é um local onde a Ciência e a Tecnologia rompem as paredes dos laboratórios que normalmente os confinam, indo ao encontro dos seus visitantes. Um local onde é possível interagir com o que está exposto; tocar, experimentar, descobrir, são uma necessidade ao longo de toda a visita. No Centro Ciência Viva de Estremoz descobres como funciona o local onde todos nós habitamos… a Terra; um planeta maravilhoso onde todos os fenómenos aparecem interligados. A colaboração com a Escola de Ciências e Tecnologia da Universidade de Évora, em especial através do Laboratório de Investigação de Rochas Industriais e Ornamentais e do Instituto de Ciência da Terra, é o garante da qualidade científica de todas as nossas atividades.",
+        "equipmentDetails": {
+            "acesso_gratuito": false,
+            "num_visitantes_medio": 50,
+            "mobilidade_reduzida": false,
+            "tutela": "Câmara Municipal de Estremoz"
+        },
+        "extras": [
+            {
+                "name": "data de inauguração",
+                "value": "27 de Maio de 2005"
+            }
+        ]
+    },
+    {
+        "name": "Escola Secundária/3 da Rainha Santa Isabel de Estremoz",
+        "group": "equipment",
+        "area": "educacao",
+        "description": "A Escola Secundária da Rainha Santa Isabel de Estremoz pretende cada vez mais melhorar o sucesso dos seus alunos, tendo por isso bem definidos os objetivos e as metas a atingir. Estes estão explícitos no seu Projeto Educativo e no seu Contrato de Autonomia. Esta é a escola da TurmaMais, que neste momento está presente em dezenas de escolas do País. Esta é a escola do Contrato de Autonomia (apenas duas no Alentejo e 22 no País possuem este tipo de Contrato com o Ministério da Educação). Esta é a escola onde uma Biblioteca dinâmica e inovadora promove a escola e organiza eventos que abrangem a comunidade local. Esta é a escola dos clubes e projetos, onde alunos e professores colaboram em causas comuns. Esta é a escola do gabinete de apoio ao aluno e ao encarregado de educação, onde existe o projeto PESES, o serviço de psicologia e orientação, o serviço de educação especial e a equipa da promoção da qualidade educativa. Esta é a escola onde os docentes se empenham, partilhando o seu trabalho de forma a promover o sucesso escolar dos alunos. Esta é a escola onde todo o pessoal não docente efetua o seu trabalho com empenho e abnegação. Esta é a escola onde a diversidade da oferta formativa acontece. Esta é a escola onde o futuro se pode decididamente projetar para além dos nossos horizontes!",
+        "equipmentDetails": {
+            "escolas": [
+                {
+                    "num_alunos": 20,
+                    "capacidade": 30,
+                    "grau_ensino": "3º cliclo"
+                },
+                {
+                    "num_alunos": 50,
+                    "capacidade": 60,
+                    "grau_ensino": "secundario"
+                }
+            ]
+        },
+        "extras": [
+            {
+                "name": "Turma Mais",
+                "value": "Sim"
+            }
+        ]
+    },
+    {
+        "name": "Point Fit - Health & Fitness",
+        "group": "equipment",
+        "area": "desporto",
+        "description": "",
+        "equipmentDetails": {
+            "capacidade": 10,
+            "iluminado": true,
+            "tipo_piso": "revestido",
+            "mobilidade_reduzida_pratica": false,
+            "mobilidade_reduzida_assistencia": false,
+            "instalacao_apoio": [
+                "Bar",
+                "Balneários"
+            ]
+        },
+        "extras": []
+    },
+    {
+        "name": "Centro de Saúde de Estremoz",
+        "group": "equipment",
+        "area": "saude",
+        "description": "",
+        "equipmentDetails": {
+            "tipo_saude": "saude_geral",
+            "num_utentes": 5,
+            "healh_details": {
+                "capacidade": 15,
+                "num_centros_saude": 1
+            }
+        },
+        "extras": [
+            {
+                "name": "agrupamento",
+                "value": "Agrupamento de Centros de Saúde do Alentejo Central"
+            }
+        ]
+    }
+]
