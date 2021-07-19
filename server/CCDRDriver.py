@@ -56,7 +56,7 @@ class CCDRDriver:
 
     def get_query_rankings(self, query: str):
         rankings, matches_score = self.get_query_rankings_with_score(query)
-        return [(tag, matches_score[tag]) for tag in rankings]
+        return sorted([(tag, matches_score[tag]) for tag in rankings], key=lambda k: k[1], reverse=True)
 
     def get_query_rankings_with_score(self, query: str):
         instance = self.interface.try_create_instance_from_value(
