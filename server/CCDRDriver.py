@@ -54,6 +54,18 @@ class CCDRDriver:
 
         self._add_equipment_with_tag(equipment, tag)
 
+    def update_equipment_by_tag(self, tag: str):
+        equipment = self.database_accessor.get_equipment_by_id(tag)
+
+        instance = self.interface.try_create_instance_from_value(
+            "equipment", equipment)
+
+        assert instance
+        self.interface.update(tag, instance)
+
+    def remove_equipment_by_tag(self, tag: str):
+        self.interface.remove(tag)
+
     def get_query_rankings(self, query: str):
         rankings, matches_score = self.get_query_rankings_with_score(query)
         return sorted([(tag, matches_score[tag]) for tag in rankings], key=lambda k: k[1], reverse=True)
