@@ -27,8 +27,6 @@ class RankingExtension:
         training_epochs: int = 150,
         learning_rate: float = 1e-3,
     ):
-        self.stringuified_equipment_tf_output: Dict[str, Any] = {}
-
         self.database_accessor = database_accessor
         self.training_epochs = training_epochs
         self.learning_rate = learning_rate
@@ -51,15 +49,10 @@ class RankingExtension:
 
         return output_
 
-    def equipment_was_added(self, tag: str, stringified: str):
-        self.stringuified_equipment_tf_output[tag] = self._get_output(
-            stringified)
-
     def rank(self, query: str, equipment_tags: Sequence[str]) -> Dict[str, float]:
         scores: List[float] = []
         query_output = self._get_output(query)
         for tag in equipment_tags:
-            assert tag in self.stringuified_equipment_tf_output
             score = self.ranker(
                 query_output, tag
             )

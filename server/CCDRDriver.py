@@ -46,9 +46,6 @@ class CCDRDriver:
         assert instance
         self.interface.add(tag, instance)
 
-        stringuified = self.ranking_stringify_equipment_func(equipment)
-        self.ranking.equipment_was_added(tag, stringuified)
-
     def add_equipment_by_tag(self, tag: str):
         equipment = self.database_accessor.get_equipment_by_id(tag)
 
