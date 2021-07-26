@@ -1,4 +1,4 @@
-from typing import Any, DefaultDict, Iterator, List, Tuple, Dict, TypeVar, Optional, Generic
+from typing import Any, DefaultDict, Iterator, List, Tuple, Dict, TypeVar, Optional, Generic, cast
 from typing_extensions import Protocol, Type, TypedDict
 from ccdr.models.equipment import Equipment
 from pymongo import MongoClient, collection
@@ -131,14 +131,14 @@ class MongoDatabaseAccessor:
         with MongoCollectionAccessorWrapper(self.config["database_host"], self.config["database"], EquipmentMongoCollectionAccessor) as access:
             equipment_from_db = access.get_equipment_data_by_id(_id)
 
-        return equipment_from_db
+        return cast(Equipment, equipment_from_db)
 
     def get_all_equipments(self):
         with MongoCollectionAccessorWrapper(self.config["database_host"], self.config["database"], EquipmentMongoCollectionAccessor) as access:
             equipments_from_db = access.get_all_equipment_data()
 
         for _id, data in equipments_from_db:
-            yield _id, data
+            yield _id, cast(Equipment, data)
 
     def get_unique_ids(self):
         with MongoCollectionAccessorWrapper(self.config["database_host"], self.config["database"], EquipmentMongoCollectionAccessor) as access:
