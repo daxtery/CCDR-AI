@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint,
+    Blueprint, request
 )
 
 import json
@@ -11,5 +11,6 @@ s_bp = Blueprint('search', __name__, url_prefix='/search')
 
 @s_bp.route('/<query>', methods=['GET'])
 def search(query: str):
-    rankings = driver.get_query_rankings(query)
+    limit = request.args.get('limit', default=0, type=int)
+    rankings = driver.get_query_rankings(query, limit)
     return json.dumps(rankings)

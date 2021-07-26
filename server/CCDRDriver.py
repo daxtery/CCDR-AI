@@ -63,9 +63,15 @@ class CCDRDriver:
     def remove_equipment_by_tag(self, tag: str):
         self.interface.remove(tag)
 
-    def get_query_rankings(self, query: str):
+    def get_query_rankings(self, query: str, limit: int):
         rankings, matches_score = self.get_query_rankings_with_score(query)
-        return sorted([(tag, matches_score[tag]) for tag in rankings], key=lambda k: k[1], reverse=True)
+        sorted_rankings = list(sorted([(tag, matches_score[tag])
+                                       for tag in rankings], key=lambda k: k[1], reverse=True))
+
+        if limit == 0:
+            return sorted_rankings
+
+        return sorted_rankings[:limit]
 
     def get_query_rankings_with_score(self, query: str):
         instance = self.interface.try_create_instance_from_value(
