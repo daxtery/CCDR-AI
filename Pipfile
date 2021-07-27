@@ -10,16 +10,13 @@ Flask = "*"
 pymongo = "*"
 tensorflow = "==2.4.1"
 dnspython = "*"
-flask-apscheduler = "*"
+Flask-APScheduler = "*"
 tensorflow-recommenders = "*"
 
 [dev-packages]
 pandas = "*"
-jupyter = "*"
-ipykernel = "*"
-matplotlib = "*"
 autopep8 = "*"
 
 [packages.interference]
+git = "https://github.com/daxtery/Interference.git"
 editable = true
-git = "https://github.com/daxtery/Trigger-Recommendations.git"
