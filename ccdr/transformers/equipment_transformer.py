@@ -187,7 +187,7 @@ def stringuify_sport(details: SportDetails):
     mobilidade_reduzida_assistencia = stringuify_value_func_guard_none(
         details.get("mobilidade_reduzida_assistencia"),
         lambda v: "Assistência a mobilidade reduzida." if v
-        else "Sem assitência a mobilidade reduzida."
+        else "Sem assistência a mobilidade reduzida."
     )
 
     def instalacao_apoio_string(instalacoes_apoio: List[InstalacaoApoio]):
